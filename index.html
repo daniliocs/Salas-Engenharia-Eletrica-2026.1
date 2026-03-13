@@ -11,6 +11,10 @@
             --card-bg: #ffffff;
             --text-main: #333333;
             --text-muted: #666666;
+            --teorica-bg: #e0f2fe;
+            --teorica-text: #0369a1;
+            --pratica-bg: #f3e8ff;
+            --pratica-text: #7e22ce;
         }
 
         body {
@@ -53,7 +57,7 @@
 
         .results-container {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
             gap: 20px;
             max-width: 1200px;
             margin: 30px auto;
@@ -64,12 +68,13 @@
             border-radius: 10px;
             padding: 20px;
             box-shadow: 0 4px 6px rgba(0,0,0,0.05);
-            border-left: 5px solid var(--primary-color);
+            border-top: 5px solid var(--primary-color);
             transition: transform 0.2s;
         }
 
         .card:hover {
-            transform: translateY(-5px);
+            transform: translateY(-3px);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.1);
         }
 
         .card-header {
@@ -79,7 +84,16 @@
             margin-bottom: 10px;
         }
 
-        .badge {
+        .badge-codigo {
+            background-color: #333;
+            color: #fff;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 13px;
+            font-weight: bold;
+        }
+
+        .badge-periodo {
             background-color: #e2e8f0;
             color: #475569;
             padding: 4px 8px;
@@ -89,26 +103,69 @@
         }
 
         .card h2 {
-            margin: 0 0 10px 0;
+            margin: 0 0 15px 0;
             font-size: 18px;
             color: var(--primary-color);
+            line-height: 1.3;
         }
 
-        .card p {
-            margin: 5px 0;
+        /* Estilos das Turmas dentro do Card */
+        .turma-container {
+            margin-top: 15px;
+            border: 1px solid #eee;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .turma-header {
+            padding: 8px 12px;
+            font-weight: bold;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
             font-size: 14px;
+        }
+
+        .turma-teorica .turma-header {
+            background-color: var(--teorica-bg);
+            color: var(--teorica-text);
+        }
+
+        .turma-pratica .turma-header {
+            background-color: var(--pratica-bg);
+            color: var(--pratica-text);
+        }
+
+        .turma-tipo-badge {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            background: rgba(255,255,255,0.5);
+            padding: 2px 6px;
+            border-radius: 4px;
+        }
+
+        .horario-item {
+            padding: 10px 12px;
+            border-top: 1px solid #eee;
+            font-size: 13px;
+            background-color: #fafafa;
+        }
+
+        .horario-item p {
+            margin: 3px 0;
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 6px;
+        }
+
+        .horario-item strong {
+            color: #555;
         }
 
         .sala-destaque {
-            margin-top: 15px !important;
-            padding: 10px;
-            background-color: #fef2f2;
-            border-radius: 6px;
-            font-weight: bold;
             color: var(--primary-color);
+            font-weight: 600;
         }
 
         .no-results {
@@ -133,61 +190,288 @@
         </main>
 
     <script>
-        // Amostra de dados estruturados (Você precisará converter o resto do PDF/Excel para este formato JSON)
-        const disciplinas = [
-            
-            { "codigo": "EEE001", "nome": "INTRODUÇÃO ENGENHARIA ELÉTRICA", "periodo": "1", "turma": "TEE", "dia": "2", "horario": "09:25-10:15", "sala": "2300-BL 4" },
-            { "codigo": "EEE021", "nome": "INTRODUÇÃO AO PROJETO DE ENGENHARIA", "periodo": "1", "turma": "TTA", "dia": "2", "horario": "10:25-12:05", "sala": "2300-BL 4" },
-            { "codigo": "EOM044", "nome": "FENOMENOS DE TRANSPORTE", "periodo": "3", "turma": "-", "dia": "3", "horario": "13:00-15:30", "sala": "2303-BL 4" },
-            { "codigo": "ELE064", "nome": "ANÁLISE DE CIRCUITOS ELETRICOS I", "periodo": "3", "turma": "A", "dia": "6", "horario": "07:30-09:10", "sala": "3011-BL 3" },
-            { "codigo": "ELE064", "nome": "ANÁLISE DE CIRCUITOS ELETRICOS I", "periodo": "3", "turma": "C", "dia": "5", "horario": "13:00-14:40", "sala": "1024-BL 3" },
-            { "codigo": "ELT124", "nome": "SISTEMAS DIGITAIS", "periodo": "3", "turma": "TA", "dia": "3", "horario": "09:25-11:05", "sala": "2300-BL 4" },
-            { "codigo": "ELT124", "nome": "SISTEMAS DIGITAIS", "periodo": "3", "turma": "TA", "dia": "5", "horario": "09:25-11:05", "sala": "2300-BL 4" },
-            { "codigo": "ELT088", "nome": "ANÁLISE DE SIST DINAMICOS LINEARES", "periodo": "4", "turma": "A", "dia": "3", "horario": "09:25-11:05", "sala": "1176-BL 4" },
-            { "codigo": "ELE065", "nome": "ANÁLISE DE CIRCUITOS ELÉTRICOS II", "periodo": "4", "turma": "A", "dia": "5", "horario": "09:25-11:05", "sala": "1176-BL 4" },
-            { "codigo": "ELT029", "nome": "LABORATÓRIO DE SISTEMAS DIGITAIS", "periodo": "4", "turma": "L1", "dia": "3", "horario": "07:30-09:10", "sala": "2030-BL 3" },
-            { "codigo": "ELT029", "nome": "LABORATÓRIO DE SISTEMAS DIGITAIS", "periodo": "4", "turma": "12", "dia": "6", "horario": "07:30-09:10", "sala": "LAB (1101 ou 1102- BL01)" },
-            { "codigo": "ELT029", "nome": "LABORATÓRIO DE SISTEMAS DIGITAIS", "periodo": "4", "turma": "-", "dia": "6", "horario": "09:25-11:05", "sala": "LAB (1101 ou 1102- BL01)" },
-            { "codigo": "ELT029", "nome": "LABORATÓRIO DE SISTEMAS DIGITAIS", "periodo": "4", "turma": "La", "dia": "6", "horario": "13:00-14:40", "sala": "LAB (1101 ou 1102- BL01)" },
-            { "codigo": "ELT029", "nome": "LABORATÓRIO DE SISTEMAS DIGITAIS", "periodo": "4", "turma": "L1", "dia": "6", "horario": "07:30-09:10", "sala": "Lab." },
-            { "codigo": "ELT029", "nome": "LABORATÓRIO DE SISTEMAS DIGITAIS", "periodo": "4", "turma": "L2", "dia": "6", "horario": "09:25-11:05", "sala": "Lab." },
-            { "codigo": "ELE028", "nome": "LABORATORIO DE CIRCUITOS ELÉTRICOS I", "periodo": "4", "turma": "L3", "dia": "6", "horario": "13:00-14:40", "sala": "Lab." },
-            { "codigo": "ELE028", "nome": "LABORATORIO DE CIRCUITOS ELÉTRICOS I", "periodo": "4", "turma": "L4", "dia": "6", "horario": "14:55-16:35", "sala": "Lab." },
-            { "codigo": "ELE028", "nome": "LABORATORIO DE CIRCUITOS ELÉTRICOS I", "periodo": "4", "turma": "P6", "dia": "6", "horario": "13:00-14:40", "sala": "Lab." },
-            { "codigo": "ELT035", "nome": "CONTROLE DE SISTEMAS LINEARES", "periodo": "5", "turma": "A1", "dia": "3", "horario": "07:30-09:10", "sala": "1165-BL 4" },
-            { "codigo": "ELT035", "nome": "CONTROLE DE SISTEMAS LINEARES", "periodo": "5", "turma": "A1", "dia": "5", "horario": "07:30-09:10", "sala": "1165-BL 4" },
-            { "codigo": "ELT035", "nome": "CONTROLE DE SISTEMAS LINEARES", "periodo": "5", "turma": "A", "dia": "4", "horario": "07:30-09:10", "sala": "2300-BL 4" },
-            { "codigo": "ELT035", "nome": "CONTROLE DE SISTEMAS LINEARES", "periodo": "5", "turma": "A", "dia": "6", "horario": "07:30-09:10", "sala": "2300-BL 4" },
-            { "codigo": "ELE001", "nome": "ELETROMAGNETISMO", "periodo": "5", "turma": "B", "dia": "-", "horario": "07:30-09:10", "sala": "1169-BL 4" },
-            { "codigo": "ELE001", "nome": "ELETROMAGNETISMO", "periodo": "5", "turma": "B", "dia": "6", "horario": "07:30-09:10", "sala": "1169-BL 4" },
-            { "codigo": "ELE066", "nome": "ANALISE DE CIRCUITOS ELÉTRICOS III", "periodo": "5", "turma": "D", "dia": "3", "horario": "14:55-16:35", "sala": "1177-BL 4" },
-            { "codigo": "ELE066", "nome": "ANALISE DE CIRCUITOS ELÉTRICOS III", "periodo": "5", "turma": "L1", "dia": "2", "horario": "13:00-14:40", "sala": "Lab." },
-            { "codigo": "ELE031", "nome": "LABORATORIO DE CIRCUITOS ELÉTRICOS", "periodo": "5", "turma": "L2", "dia": "3", "horario": "13:00-14:40", "sala": "Lab." },
-            { "codigo": "ELE031", "nome": "LABORATORIO DE CIRCUITOS ELÉTRICOS", "periodo": "5", "turma": "L3", "dia": "5", "horario": "13:00-14:40", "sala": "Lab." },
-            { "codigo": "ELE031", "nome": "LABORATORIO DE CIRCUITOS ELÉTRICOS", "periodo": "5", "turma": "L4", "dia": "5", "horario": "14:55-16:35", "sala": "Lab." },
-            { "codigo": "ELE031", "nome": "LABORATORIO DE CIRCUITOS ELÉTRICOS", "periodo": "5", "turma": "-", "dia": "2", "horario": "09:25-11:05", "sala": "1176-BL 4" },
-            { "codigo": "ELT123", "nome": "ARQUITETURA E ORGANIZAÇÃO DE COMPUTADORES", "periodo": "5", "turma": "TA", "dia": "-", "horario": "09:25-11:05", "sala": "1176-BL 4" },
-            { "codigo": "ELE029", "nome": "SISTEMAS DE MEDIÇÃO", "periodo": "6", "turma": "TB", "dia": "3", "horario": "09:25-11:05", "sala": "2307-BL 4" },
-            { "codigo": "ELE032", "nome": "TEORIA DOS MATERIAIS", "periodo": "6", "turma": "B", "dia": "4", "horario": "09:25-11:05", "sala": "2303-BL 4" },
-            { "codigo": "ELE032", "nome": "TEORIA DOS MATERIAIS", "periodo": "6", "turma": "B", "dia": "6", "horario": "09:25-11:05", "sala": "2303-BL 4" },
-            { "codigo": "ELE033", "nome": "CIRCUITOS POLIFÁSICOS E MAGNÉTICOS", "periodo": "6", "turma": "A", "dia": "2", "horario": "09:25-11:55", "sala": "2303-BL 4" },
-            { "codigo": "ELE034", "nome": "CONVERSÃO DE ENERGIA", "periodo": "6", "turma": "A", "dia": "-", "horario": "07:30-09:10", "sala": "2300-BL 4" },
-            { "codigo": "ELE034", "nome": "CONVERSÃO DE ENERGIA", "periodo": "6", "turma": "A", "dia": "5", "horario": "07:30-09:10", "sala": "2300-BL 4" },
-            { "codigo": "ELT085", "nome": "CIRCUITOS ELETRÔNICOS ANALÓGICOS", "periodo": "6", "turma": "A", "dia": "4", "horario": "07:30-09:10", "sala": "3010-BL 3" },
-            { "codigo": "ELT085", "nome": "CIRCUITOS ELETRÔNICOS ANALÓGICOS", "periodo": "6", "turma": "A", "dia": "6", "horario": "07:30-09:10", "sala": "3010-BL 3" },
-            { "codigo": "ELT086", "nome": "TEORIA DE COMUNICAÇÕES", "periodo": "6", "turma": "B", "dia": "5", "horario": "09:25-11:55", "sala": "2307-BL 4" },
-            { "codigo": "ELE029", "nome": "SISTEMAS DE MEDIÇÃO", "periodo": "6", "turma": "L1", "dia": "2", "horario": "13:00-14:40", "sala": "Lab." },
-            { "codigo": "ELE029", "nome": "SISTEMAS DE MEDIÇÃO", "periodo": "6", "turma": "-", "dia": "3", "horario": "13:00-14:40", "sala": "Lab." },
-            { "codigo": "ELE029", "nome": "SISTEMAS DE MEDIÇÃO", "periodo": "6", "turma": "L4", "dia": "3", "horario": "14:55-16:35", "sala": "Lab." },
-            { "codigo": "ELE033", "nome": "CIRCUITOS POLIFÁSICOS E MAGNÉTICOS", "periodo": "6", "turma": "L1", "dia": "3", "horario": "13:00-14:40", "sala": "Lab." },
-            { "codigo": "ELE033", "nome": "CIRCUITOS POLIFÁSICOS E MAGNÉTICOS", "periodo": "6", "turma": "L4", "dia": "3", "horario": "14:55-16:35", "sala": "Lab." },
-            { "codigo": "ELE033", "nome": "CIRCUITOS POLIFÁSICOS E MAGNÉTICOS", "periodo": "6", "turma": "PL2", "dia": "3", "horario": "14:55-16:35", "sala": "Lab." },
-            { "codigo": "ELE033", "nome": "CIRCUITOS POLIFÁSICOS E MAGNÉTICOS", "periodo": "6", "turma": "PL3", "dia": "3", "horario": "13:00-14:40", "sala": "Lab." },
-            { "codigo": "ELT089", "nome": "LABORATORIO DE CIRCUITOS ELETRÔNICOS I", "periodo": "6", "turma": "L1", "dia": "2", "horario": "13:00-14:40", "sala": "Lab." },
-            { "codigo": "ELT089", "nome": "LABORATORIO DE CIRCUITOS ELETRÔNICOS I", "periodo": "6", "turma": "L2", "dia": "2", "horario": "14:55-16:35", "sala": "Lab." },
-            { "codigo": "ELT089", "nome": "LABORATORIO DE CIRCUITOS ELETRÔNICOS I", "periodo": "6", "turma": "L3", "dia": "5", "horario": "13:00-14:40", "sala": "Lab." }
+        // Substitua este array pelos dados do seu arquivo JSON gerado pelo Python!
+        // Deixei algumas de exemplo para você ver a diferença entre teórica e laboratório.
+        let disciplinasBrutas = [
+
+  { "codigo": "EEE001", "nome": "INTRODUÇÃO À ENGENHARIA ELÉTRICA", "periodo": "1", "turma": "TEE", "dia": "2", "horario": "09:25-10:15", "sala": "2300-BL 4" },
+  { "codigo": "EEE021", "nome": "INTRODUÇÃO AO PROJETO DE ENGENHARIA", "periodo": "1", "turma": "TTA", "dia": "2", "horario": "10:25-12:05", "sala": "2300-BL 4" },
+  { "codigo": "EQM044", "nome": "FENÔMENOS DE TRANSPORTE", "periodo": "3", "turma": "C", "dia": "3", "horario": "13:00-15:30", "sala": "2303-BL 4" },
+  { "codigo": "ELE064", "nome": "ANÁLISE DE CIRCUITOS ELÉTRICOS I", "periodo": "3", "turma": "A", "dia": "6", "horario": "07:30-09:10", "sala": "3011-BL 3" },
+  { "codigo": "ELE064", "nome": "ANÁLISE DE CIRCUITOS ELÉTRICOS I", "periodo": "3", "turma": "C", "dia": "5", "horario": "13:00-14:40", "sala": "1024-BL 3" },
+  { "codigo": "ELT124", "nome": "SISTEMAS DIGITAIS", "periodo": "3", "turma": "TA", "dia": "3", "horario": "09:25-11:05", "sala": "2300-BL 4" },
+  { "codigo": "ELT124", "nome": "SISTEMAS DIGITAIS", "periodo": "3", "turma": "TA", "dia": "5", "horario": "09:25-11:05", "sala": "2300-BL 4" },
+  { "codigo": "ELT088", "nome": "ANÁLISE DE SIST. DINÂMICOS LINEARES", "periodo": "4", "turma": "A", "dia": "3", "horario": "09:25-11:05", "sala": "1176-BL 4" },
+  { "codigo": "ELT088", "nome": "ANÁLISE DE SIST. DINÂMICOS LINEARES", "periodo": "4", "turma": "A", "dia": "5", "horario": "09:25-11:05", "sala": "1176-BL 4" },
+  { "codigo": "ELE065", "nome": "ANÁLISE DE CIRCUITOS ELÉTRICOS II", "periodo": "4", "turma": "A", "dia": "3", "horario": "07:30-09:10", "sala": "2030-BL 3" },
+  { "codigo": "ELT029", "nome": "LABORATÓRIO DE SISTEMAS DIGITAIS", "periodo": "4", "turma": "L1", "dia": "6", "horario": "07:30-09:10", "sala": "LAB (1101 ou 1102-BL01)" },
+  { "codigo": "ELT029", "nome": "LABORATÓRIO DE SISTEMAS DIGITAIS", "periodo": "4", "turma": "L2", "dia": "6", "horario": "09:25-11:05", "sala": "LAB (1101 ou 1102-BL01)" },
+  { "codigo": "ELT029", "nome": "LABORATÓRIO DE SISTEMAS DIGITAIS", "periodo": "4", "turma": "L3", "dia": "6", "horario": "13:00-14:40", "sala": "LAB (1101 ou 1102-BL01)" },
+  { "codigo": "ELE028", "nome": "LABORATÓRIO DE CIRCUITOS ELÉTRICOS I", "periodo": "4", "turma": "L1", "dia": "6", "horario": "07:30-09:10", "sala": "Lab." },
+  { "codigo": "ELE028", "nome": "LABORATÓRIO DE CIRCUITOS ELÉTRICOS I", "periodo": "4", "turma": "L2", "dia": "6", "horario": "09:25-11:05", "sala": "Lab." },
+  { "codigo": "ELE028", "nome": "LABORATÓRIO DE CIRCUITOS ELÉTRICOS I", "periodo": "4", "turma": "L3", "dia": "6", "horario": "13:00-14:40", "sala": "Lab." },
+  { "codigo": "ELE028", "nome": "LABORATÓRIO DE CIRCUITOS ELÉTRICOS I", "periodo": "4", "turma": "L4", "dia": "6", "horario": "14:55-16:35", "sala": "Lab." },
+  { "codigo": "ELE028", "nome": "LABORATÓRIO DE CIRCUITOS ELÉTRICOS I", "periodo": "4", "turma": "P6", "dia": "6", "horario": "13:00-14:40", "sala": "Lab." },
+  { "codigo": "ELT035", "nome": "CONTROLE DE SISTEMAS LINEARES", "periodo": "5", "turma": "A1", "dia": "3", "horario": "07:30-09:10", "sala": "1165-BL 4" },
+  { "codigo": "ELT035", "nome": "CONTROLE DE SISTEMAS LINEARES", "periodo": "5", "turma": "A1", "dia": "5", "horario": "07:30-09:10", "sala": "1165-BL 4" },
+  { "codigo": "ELE001", "nome": "*ELETROMAGNETISMO", "periodo": "5", "turma": "*A", "dia": "4", "horario": "07:30-09:10", "sala": "2300-BL 4" },
+  { "codigo": "ELE001", "nome": "*ELETROMAGNETISMO", "periodo": "5", "turma": "*A", "dia": "6", "horario": "07:30-09:10", "sala": "2300-BL 4" },
+  { "codigo": "ELE001", "nome": "*ELETROMAGNETISMO", "periodo": "5", "turma": "B", "dia": "4", "horario": "07:30-09:10", "sala": "1169-BL 4" },
+  { "codigo": "ELE001", "nome": "*ELETROMAGNETISMO", "periodo": "5", "turma": "B", "dia": "6", "horario": "07:30-09:10", "sala": "1169-BL 4" },
+  { "codigo": "ELE066", "nome": "ANÁLISE DE CIRCUITOS ELÉTRICOS III", "periodo": "5", "turma": "D", "dia": "3", "horario": "14:55-16:35", "sala": "1177-BL 4" },
+  { "codigo": "ELE031", "nome": "LABORATÓRIO DE CIRCUITOS ELÉTRICOS II", "periodo": "5", "turma": "L1", "dia": "2", "horario": "13:00-14:40", "sala": "Lab." },
+  { "codigo": "ELE031", "nome": "LABORATÓRIO DE CIRCUITOS ELÉTRICOS II", "periodo": "5", "turma": "L2", "dia": "3", "horario": "13:00-14:40", "sala": "Lab." },
+  { "codigo": "ELE031", "nome": "LABORATÓRIO DE CIRCUITOS ELÉTRICOS II", "periodo": "5", "turma": "L3", "dia": "5", "horario": "13:00-14:40", "sala": "Lab." },
+  { "codigo": "ELE031", "nome": "LABORATÓRIO DE CIRCUITOS ELÉTRICOS II", "periodo": "5", "turma": "L4", "dia": "5", "horario": "14:55-16:35", "sala": "Lab." },
+  { "codigo": "ELT123", "nome": "ARQUITETURA E ORGANIZAÇÃO DE COMPUTADORES", "periodo": "5", "turma": "TA", "dia": "2", "horario": "09:25-11:05", "sala": "1176-BL 4" },
+  { "codigo": "ELT123", "nome": "ARQUITETURA E ORGANIZAÇÃO DE COMPUTADORES", "periodo": "5", "turma": "TA", "dia": "4", "horario": "09:25-11:05", "sala": "1176-BL 4" },
+  { "codigo": "ELE029", "nome": "SISTEMAS DE MEDIÇÃO", "periodo": "6", "turma": "TB", "dia": "3", "horario": "09:25-11:05", "sala": "2307-BL 4" },
+  { "codigo": "ELE032", "nome": "TEORIA DOS MATERIAIS", "periodo": "6", "turma": "B", "dia": "4", "horario": "09:25-11:05", "sala": "2303-BL 4" },
+  { "codigo": "ELE032", "nome": "TEORIA DOS MATERIAIS", "periodo": "6", "turma": "B", "dia": "6", "horario": "09:25-11:05", "sala": "2303-BL 4" },
+  { "codigo": "ELE033", "nome": "CIRCUITOS POLIFÁSICOS E MAGNÉTICOS", "periodo": "6", "turma": "A", "dia": "2", "horario": "09:25-11:55", "sala": "2303-BL 4" },
+  { "codigo": "ELE034", "nome": "CONVERSÃO DE ENERGIA", "periodo": "6", "turma": "A", "dia": "3", "horario": "07:30-09:10", "sala": "2300-BL 4" },
+  { "codigo": "ELE034", "nome": "CONVERSÃO DE ENERGIA", "periodo": "6", "turma": "A", "dia": "5", "horario": "07:30-09:10", "sala": "2300-BL 4" },
+  { "codigo": "ELT085", "nome": "CIRCUITOS ELETRÔNICOS ANALÓGICOS", "periodo": "6", "turma": "A", "dia": "4", "horario": "07:30-09:10", "sala": "3010-BL 3" },
+  { "codigo": "ELT085", "nome": "CIRCUITOS ELETRÔNICOS ANALÓGICOS", "periodo": "6", "turma": "A", "dia": "6", "horario": "07:30-09:10", "sala": "3010-BL 3" },
+  { "codigo": "ELT086", "nome": "TEORIA DE COMUNICAÇÕES", "periodo": "6", "turma": "B", "dia": "5", "horario": "09:25-11:55", "sala": "2307-BL 4" },
+  { "codigo": "ELE029", "nome": "SISTEMAS DE MEDIÇÃO", "periodo": "6", "turma": "L1", "dia": "2", "horario": "13:00-14:40", "sala": "Lab." },
+  { "codigo": "ELE029", "nome": "SISTEMAS DE MEDIÇÃO", "periodo": "6", "turma": "L3", "dia": "3", "horario": "13:00-14:40", "sala": "Lab." },
+  { "codigo": "ELE029", "nome": "SISTEMAS DE MEDIÇÃO", "periodo": "6", "turma": "L4", "dia": "3", "horario": "14:55-16:35", "sala": "Lab." },
+  { "codigo": "ELE033", "nome": "CIRCUITOS POLIFÁSICOS E MAGNÉTICOS", "periodo": "6", "turma": "L1", "dia": "3", "horario": "13:00-14:40", "sala": "Lab." },
+  { "codigo": "ELE033", "nome": "CIRCUITOS POLIFÁSICOS E MAGNÉTICOS", "periodo": "6", "turma": "L4", "dia": "3", "horario": "14:55-16:35", "sala": "Lab." },
+  { "codigo": "ELE033", "nome": "CIRCUITOS POLIFÁSICOS E MAGNÉTICOS", "periodo": "6", "turma": "PL2", "dia": "3", "horario": "14:55-16:35", "sala": "Lab." },
+  { "codigo": "ELE033", "nome": "CIRCUITOS POLIFÁSICOS E MAGNÉTICOS", "periodo": "6", "turma": "PL3", "dia": "3", "horario": "13:00-14:40", "sala": "Lab." },
+  { "codigo": "ELT089", "nome": "LABORATÓRIO DE CIRCUITOS ELETRÔNICOS I", "periodo": "6", "turma": "L1", "dia": "2", "horario": "13:00-14:40", "sala": "Lab." },
+  { "codigo": "ELT089", "nome": "LABORATÓRIO DE CIRCUITOS ELETRÔNICOS I", "periodo": "6", "turma": "L2", "dia": "2", "horario": "14:55-16:35", "sala": "Lab." },
+  { "codigo": "ELT089", "nome": "LABORATÓRIO DE CIRCUITOS ELETRÔNICOS I", "periodo": "6", "turma": "L3", "dia": "5", "horario": "13:00-14:40", "sala": "Lab." },
+  { "codigo": "ELT013", "nome": "CONTROLE DIGITAL", "periodo": "7", "turma": "TXA01", "dia": "3", "horario": "16:50-18:30", "sala": "1027-BL 3" },
+  { "codigo": "ELT013", "nome": "CONTROLE DIGITAL", "periodo": "7", "turma": "TXA01", "dia": "5", "horario": "14:55-16:35", "sala": "1027-BL 3" },
+  { "codigo": "ELE042", "nome": "PROCESSAMENTO DE SINAIS", "periodo": "7", "turma": "TTT", "dia": "2", "horario": "19:00-22:35", "sala": "3010-BL 3" },
+  { "codigo": "ELE042", "nome": "PROCESSAMENTO DE SINAIS", "periodo": "7", "turma": "TTTO", "dia": "3", "horario": "07:30-09:10", "sala": "1166-BL 4" },
+  { "codigo": "ELE042", "nome": "PROCESSAMENTO DE SINAIS", "periodo": "7", "turma": "TTTO", "dia": "5", "horario": "07:30-09:10", "sala": "1166-BL 4" },
+  { "codigo": "ELE039", "nome": "ACIONAMENTOS ELÉTRICOS (ENG121)", "periodo": "7", "turma": "TTTE", "dia": "3", "horario": "17:00-18:40", "sala": "1032-BL 3" },
+  { "codigo": "ELE039", "nome": "ACIONAMENTOS ELÉTRICOS (ENG121)", "periodo": "7", "turma": "TTTE", "dia": "5", "horario": "17:00-18:40", "sala": "1032-BL 3" },
+  { "codigo": "ELE049", "nome": "ANÁLISE DE SISTEMAS ELÉTRICOS POTÊNCIA", "periodo": "7", "turma": "TTTAB", "dia": "2", "horario": "09:25-11:05", "sala": "LRC" },
+  { "codigo": "ELE049", "nome": "ANÁLISE DE SISTEMAS ELÉTRICOS POTÊNCIA", "periodo": "7", "turma": "TTTAB", "dia": "4", "horario": "09:25-11:05", "sala": "LRC" },
+  { "codigo": "ELE050", "nome": "TRANSITÓRIOS EM SISTEMAS DE ENERGIA ELÉTRICA", "periodo": "7", "turma": "TB", "dia": "3", "horario": "09:25-11:05", "sala": "3011-BL 3" },
+  { "codigo": "ELE050", "nome": "TRANSITÓRIOS EM SISTEMAS DE ENERGIA ELÉTRICA", "periodo": "7", "turma": "TB", "dia": "5", "horario": "10:15-11:55", "sala": "3012-BL 3" },
+  { "codigo": "ELT040", "nome": "ELETRÔNICA DE POTÊNCIA (ENG121)", "periodo": "7", "turma": "TTA", "dia": "2", "horario": "07:30-09:10", "sala": "3011-BL 3" },
+  { "codigo": "ELT040", "nome": "ELETRÔNICA DE POTÊNCIA (ENG121)", "periodo": "7", "turma": "TTA", "dia": "4", "horario": "07:30-09:10", "sala": "3011-BL 3" },
+  { "codigo": "ELE035", "nome": "LABORATÓRIO DE CONVERSÃO DE ENERGIA", "periodo": "7", "turma": "L1", "dia": "6", "horario": "07:30-09:10", "sala": "Lab." },
+  { "codigo": "ELE035", "nome": "LABORATÓRIO DE CONVERSÃO DE ENERGIA", "periodo": "7", "turma": "L2", "dia": "6", "horario": "09:25-11:05", "sala": "Lab." },
+  { "codigo": "ELE035", "nome": "LABORATÓRIO DE CONVERSÃO DE ENERGIA", "periodo": "7", "turma": "L3", "dia": "6", "horario": "13:00-14:40", "sala": "Lab." },
+  { "codigo": "ELE035", "nome": "LABORATÓRIO DE CONVERSÃO DE ENERGIA", "periodo": "7", "turma": "L4", "dia": "6", "horario": "14:55-16:35", "sala": "Lab." },
+  { "codigo": "ELT087", "nome": "LABORATÓRIO DE COMUNICAÇÕES", "periodo": "7", "turma": "L1", "dia": "4", "horario": "13:00-14:40", "sala": "Lab." },
+  { "codigo": "ELT087", "nome": "LABORATÓRIO DE COMUNICAÇÕES", "periodo": "7", "turma": "L2", "dia": "4", "horario": "14:55-16:35", "sala": "Lab." },
+  { "codigo": "ELT087", "nome": "LABORATÓRIO DE COMUNICAÇÕES", "periodo": "7", "turma": "L3", "dia": "5", "horario": "13:00-14:40", "sala": "Lab." },
+  { "codigo": "ELT087", "nome": "LABORATÓRIO DE COMUNICAÇÕES", "periodo": "7", "turma": "L4", "dia": "5", "horario": "14:55-16:35", "sala": "Lab." },
+  { "codigo": "ELT090", "nome": "LABORATÓRIO DE CIRCUITOS ELETRÔNICOS II", "periodo": "7", "turma": "L1", "dia": "6", "horario": "07:30-09:10", "sala": "LAB." },
+  { "codigo": "ELT090", "nome": "LABORATÓRIO DE CIRCUITOS ELETRÔNICOS II", "periodo": "7", "turma": "L2", "dia": "6", "horario": "09:25-11:05", "sala": "LAB." },
+  { "codigo": "ELT090", "nome": "LABORATÓRIO DE CIRCUITOS ELETRÔNICOS II", "periodo": "7", "turma": "L3", "dia": "6", "horario": "13:00-14:40", "sala": "LAB." },
+  { "codigo": "ELT090", "nome": "LABORATÓRIO DE CIRCUITOS ELETRÔNICOS II", "periodo": "7", "turma": "L4", "dia": "6", "horario": "14:55-16:35", "sala": "LAB." },
+  { "codigo": "ELT014", "nome": "LABORATÓRIO DE CONTROLE E AUTOMAÇÃO I", "periodo": "7", "turma": "PPEA", "dia": "5", "horario": "14:55-16:35", "sala": "LAB" },
+  { "codigo": "ELT044", "nome": "TEORIA DA IRRADIAÇÃO E ONDAS GUIADAS", "periodo": "7", "turma": "A", "dia": "2", "horario": "07:30-09:10", "sala": "NÃO OFERTADA 1/2026" },
+  { "codigo": "ELT044", "nome": "TEORIA DA IRRADIAÇÃO E ONDAS GUIADAS", "periodo": "7", "turma": "A", "dia": "4", "horario": "07:30-09:10", "sala": "NÃO OFERTADA 1/2026" },
+  { "codigo": "ELT130", "nome": "TÉCNICAS DE CONTROLE DE PROCESSOS INDUSTRIAIS(ELT039)", "periodo": "7", "turma": "TD1", "dia": "2", "horario": "16:50-18:30", "sala": "2030-BL 3" },
+  { "codigo": "ELT130", "nome": "TÉCNICAS DE CONTROLE DE PROCESSOS INDUSTRIAIS(ELT039)", "periodo": "7", "turma": "TD1", "dia": "4", "horario": "14:55-16:35", "sala": "1027-BL 3" },
+  { "codigo": "ELE040", "nome": "LABORATÓRIO DE ACIONAMENTOS ELÉTRICOS", "periodo": "8", "turma": "L2", "dia": "6", "horario": "07:30-10:00", "sala": "Lab." },
+  { "codigo": "ELT042", "nome": "LABORATÓRIO DE ELETRÔNICA DE POTÊNCIA", "periodo": "8", "turma": "L1/PL1", "dia": "4", "horario": "09:25-11:55", "sala": "Lab." },
+  { "codigo": "ELT042", "nome": "LABORATÓRIO DE ELETRÔNICA DE POTÊNCIA", "periodo": "8", "turma": "L2", "dia": "5", "horario": "09:25-11:55", "sala": "Lab." },
+  { "codigo": "EEE022", "nome": "GESTÃO DE PROJETOS TECNOLÓGICOS", "periodo": "9", "turma": "TB", "dia": "2", "horario": "13:00-14:40", "sala": "2006-BL 3" },
+  { "codigo": "EEE022", "nome": "GESTÃO DE PROJETOS TECNOLÓGICOS", "periodo": "9", "turma": "TPCC", "dia": "2", "horario": "15:45-17:25", "sala": "2006-BL 3" },
+  { "codigo": "EEE044", "nome": "ESTAGIO CURRICULAR", "periodo": "9", "turma": "TTEE", "dia": "Sáb.", "horario": "08:20-09:10", "sala": "ATIVIDADE CURRICULAR" },
+  { "codigo": "EEE023", "nome": "TRABALHO DE CONCLUSÃO DE CURSO", "periodo": "10", "turma": "TTCC", "dia": "Sáb.", "horario": "09:25-11:05", "sala": "2026-BL 3" },
+  { "codigo": "EEE020", "nome": "ESTAGIO SUPERVISIONADO EM ENGENHARIA DE SISTEMAS", "periodo": "At. cur.", "turma": "TTE", "dia": "Sáb.", "horario": "00:00-00:01", "sala": "Atividade Curricular" },
+  { "codigo": "ECN075", "nome": "ECONOMIA PARA ENGENHARIA", "periodo": "Opt.", "turma": "TE1", "dia": "6", "horario": "13:00-14:40", "sala": "1176-BL 4" },
+  { "codigo": "EPD095", "nome": "FUNDAMENTOS DE ENGENHARIA ECONÔMICA", "periodo": "Opt.", "turma": "TTF", "dia": "2", "horario": "11:10-12:50", "sala": "1176-BL 4" },
+  { "codigo": "ELT016", "nome": "TÉCNICAS DE MODELAGEM DE SISTEMAS DINÂMICOS", "periodo": "Opt.", "turma": "TS/TX1/TAE", "dia": "3", "horario": "19:00-20:40", "sala": "1022-BL 3" },
+  { "codigo": "ELT075", "nome": "REDES NEURAIS ARTIFICIAIS(ENG100)", "periodo": "Opt.", "turma": "TA", "dia": "3", "horario": "19:00-20:40", "sala": "NÃO 2024/2" },
+  { "codigo": "EPD035", "nome": "PLANEJAMENTO DA PRODUÇÃO", "periodo": "Opt.", "turma": "TTTTP", "dia": "4", "horario": "07:30-09:10", "sala": "2009-BL 3" },
+  { "codigo": "EPD035", "nome": "PLANEJAMENTO DA PRODUÇÃO", "periodo": "Opt.", "turma": "TTTTP", "dia": "6", "horario": "07:30-09:10", "sala": "2009-BL 3" },
+  { "codigo": "ELT084", "nome": "DISP. E CIRC. ELETRÔNICOS BÁSICOS", "periodo": "Opt.", "turma": "B", "dia": "3", "horario": "09:25-11:05", "sala": "1165-BL 4" },
+  { "codigo": "ELT084", "nome": "DISP. E CIRC. ELETRÔNICOS BÁSICOS", "periodo": "Opt.", "turma": "B", "dia": "5", "horario": "09:25-11:05", "sala": "1165-BL 4" },
+  { "codigo": "ELE043", "nome": "COMPATIBILIDADE ELETROMAGNÉTICA", "periodo": "Opt.", "turma": "A", "dia": "2", "horario": "09:25-11:05", "sala": "3011-BL 3" },
+  { "codigo": "ELE054", "nome": "INST. RESIDENCIAIS E PREDIAIS (SL1022)", "periodo": "Opt.", "turma": "TTECC", "dia": "5", "horario": "09:25-11:05", "sala": "1022-BL 3" },
+  { "codigo": "ELT036", "nome": "FUNDAMENTOS DE REDES DE COMUNICAÇÃO (ENG121, ENG075)#", "periodo": "Opt.", "turma": "TEE", "dia": "4", "horario": "07:30-09:10", "sala": "1162-BL 4" },
+  { "codigo": "ELT036", "nome": "FUNDAMENTOS DE REDES DE COMUNICAÇÃO (ENG121, ENG075)#", "periodo": "Opt.", "turma": "TEE", "dia": "6", "horario": "07:30-09:10", "sala": "1162-BL 4" },
+  { "codigo": "ENU005", "nome": "METODOLOGIA E MODELOS DE PLANEJAMENTO ENERGÉTICO", "periodo": "Opt.", "turma": "TENU5", "dia": "3", "horario": "13:00-14:40", "sala": "1176-BL 4" },
+  { "codigo": "ENU005", "nome": "METODOLOGIA E MODELOS DE PLANEJAMENTO ENERGÉTICO", "periodo": "Opt.", "turma": "TENU5", "dia": "5", "horario": "13:00-14:40", "sala": "1176-BL 4" },
+  { "codigo": "ENU006", "nome": "FUNDAMENTOS DE ENERGIA NUCLEAR", "periodo": "Opt.", "turma": "TENU6", "dia": "4", "horario": "09:25-11:55", "sala": "1177-BL 4" },
+  { "codigo": "ELE043", "nome": "COMPATIBILIDADE ELETROMAGNETICA", "periodo": "Opt.", "turma": "PL1", "dia": "3", "horario": "13:00-14:40", "sala": "Lab." },
+  { "codigo": "ELE043", "nome": "COMPATIBILIDADE ELETROMAGNETICA", "periodo": "Opt.", "turma": "PL2", "dia": "4", "horario": "13:00-14:40", "sala": "Lab." },
+  { "codigo": "ELE043", "nome": "COMPATIBILIDADE ELETROMAGNETICA", "periodo": "Opt.", "turma": "PL3", "dia": "3", "horario": "13:00-14:40", "sala": "Lab." },
+  { "codigo": "ELE043", "nome": "COMPATIBILIDADE ELETROMAGNETICA", "periodo": "Opt.", "turma": "PL4", "dia": "6", "horario": "13:00-14:40", "sala": "Lab." },
+  { "codigo": "ELE054", "nome": "INSTALAÇÕES ELÉTRICAS RESIDENCIAIS E PREDIAIS", "periodo": "Opt.", "turma": "L1/PLECA", "dia": "5", "horario": "13:00-14:40", "sala": "Lab." },
+  { "codigo": "ELE054", "nome": "INSTALAÇÕES ELÉTRICAS RESIDENCIAIS E PREDIAIS", "periodo": "Opt.", "turma": "L2/PL2", "dia": "5", "horario": "14:55-16:35", "sala": "Lab." },
+  { "codigo": "ELE075", "nome": "SISTEMAS NEBULOSOS", "periodo": "Opt.", "turma": "TTS", "dia": "5", "horario": "14:55-16:35", "sala": "3011-BL 3" },
+  { "codigo": "EPD034", "nome": "SISTEMA DE DESENVOLVIMENTO DO PRODUTO", "periodo": "Opt.", "turma": "TTP", "dia": "4", "horario": "07:30-09:10", "sala": "1176-BL 4" },
+  { "codigo": "EPD034", "nome": "SISTEMA DE DESENVOLVIMENTO DO PRODUTO", "periodo": "Opt.", "turma": "TTP", "dia": "6", "horario": "07:30-09:10", "sala": "1027-BL 3" },
+  { "codigo": "ELE041", "nome": "MANIPULADORES ROBÓTICOS (ENG121)", "periodo": "Opt.", "turma": "TTECA", "dia": "2", "horario": "14:55-16:35", "sala": "3011-BL 3" },
+  { "codigo": "ELE041", "nome": "MANIPULADORES ROBÓTICOS (ENG121)", "periodo": "Opt.", "turma": "TTECA", "dia": "4", "horario": "16:50-18:30", "sala": "3011-BL 3" },
+  { "codigo": "ELE046", "nome": "QUALIDADE DA ENERGIA ELÉTRICA", "periodo": "Opt.", "turma": "TTAA", "dia": "6", "horario": "09:25-11:55", "sala": "3011-BL 3" },
+  { "codigo": "EEE009", "nome": "TEEE C - OPEI OFICINA DE PROJETOS, EMPREENDEDORISMO E INOVAÇÃO", "periodo": "Opt.", "turma": "TA", "dia": "3", "horario": "17:00-18:40", "sala": "2030-BL 3" },
+  { "codigo": "EEE009", "nome": "TEEE C - OPEI OFICINA DE PROJETOS, EMPREENDEDORISMO E INOVAÇÃO", "periodo": "Opt.", "turma": "TA", "dia": "5", "horario": "17:00-18:40", "sala": "2030-BL 3" },
+  { "codigo": "ELT130", "nome": "TÉCNICAS DE CONTROLE DE PROCESSOS INDUSTRIAIS(ELT039)", "periodo": "Opt.", "turma": "TCAE", "dia": "2", "horario": "19:00-20:40", "sala": "1027-BL 3" },
+  { "codigo": "ELT130", "nome": "TÉCNICAS DE CONTROLE DE PROCESSOS INDUSTRIAIS(ELT039)", "periodo": "Opt.", "turma": "TCAE", "dia": "4", "horario": "20:55-22:35", "sala": "1027-BL 3" },
+  { "codigo": "ELT131", "nome": "REDES NEURAIS ARTIFICIAIS (ENG121)", "periodo": "Opt.", "turma": "TB", "dia": "2", "horario": "09:25-11:05", "sala": "3012-BL 3" },
+  { "codigo": "ELT131", "nome": "REDES NEURAIS ARTIFICIAIS (ENG121)", "periodo": "Opt.", "turma": "TB", "dia": "4", "horario": "09:25-11:05", "sala": "3012-BL 3" },
+  { "codigo": "ELT135", "nome": "RECONHECIMENTO DE PADRÕES (ENG121)", "periodo": "Opt.", "turma": "TIRP/TA/TB", "dia": "2", "horario": "16:50-18:30", "sala": "1033-BL 3" },
+  { "codigo": "ELT135", "nome": "RECONHECIMENTO DE PADRÕES (ENG121)", "periodo": "Opt.", "turma": "TIRP/TA/TB", "dia": "4", "horario": "16:50-18:30", "sala": "1033-BL 3" },
+  { "codigo": "ELE037", "nome": "OTIMIZAÇÃO (ENG075, ENG121)", "periodo": "Opt.", "turma": "TTTA", "dia": "4", "horario": "14:55-16:35", "sala": "3015-BL 3" },
+  { "codigo": "ELE037", "nome": "OTIMIZAÇÃO (ENG075, ENG121)", "periodo": "Opt.", "turma": "TTTA", "dia": "6", "horario": "14:55-16:35", "sala": "3015-BL 3" },
+  { "codigo": "EEE007", "nome": "TEE A - INOVAÇÃO NA PRÁTICA - TRANSFORMANDO IDÉIAS EM RESULTADOS(ENG100)", "periodo": "Opt.", "turma": "TC", "dia": "5", "horario": "17:00-18:40", "sala": "NÃO 2024/2" },
+  { "codigo": "EEE007", "nome": "TEE A - INOVAÇÃO NA PRÁTICA - TRANSFORMANDO IDÉIAS EM RESULTADOS(ENG100)", "periodo": "Opt.", "turma": "TIP", "dia": "5", "horario": "17:00-18:40", "sala": "NÃO 2024/2" },
+  { "codigo": "EEE026", "nome": "PROJETO DE SISTEMAS EMBUTIDOS(ENG121)", "periodo": "Opt.", "turma": "TTTEE", "dia": "3", "horario": "17:00-18:40", "sala": "3011-BL 3" },
+  { "codigo": "EEE026", "nome": "PROJETO DE SISTEMAS EMBUTIDOS(ENG121)", "periodo": "Opt.", "turma": "TTTEE", "dia": "5", "horario": "17:00-18:40", "sala": "3011-BL 3" },
+  { "codigo": "ELT095", "nome": "PROJETOS COM AMPLIFICADORES OPERACIONAIS E CIRCUITOS ELETRÔNICOS ANALÓGICOS", "periodo": "Opt.", "turma": "B", "dia": "3", "horario": "08:20-10:50", "sala": "NÃO 2024/2 (LAB)" },
+  { "codigo": "EPD001", "nome": "ORGANIZAÇÃO INDUSTRIAL PARA ENGENHARIA", "periodo": "Opt.", "turma": "TN/TABOL", "dia": "2", "horario": "00:00-00:01", "sala": "ONLINE" },
+  { "codigo": "ELT043", "nome": "FONTES DE ALIMENTACAO CC E CA", "periodo": "Opt.", "turma": "TA/TB", "dia": "3", "horario": "09:30-11:55", "sala": "3013-BL 3" },
+  { "codigo": "EEE009", "nome": "TEE C - PROGRAMAÇÃO DE SISTEMAS EMBARCADOS (ENG121, ENG075)", "periodo": "Opt.", "turma": "TD", "dia": "2", "horario": "17:00-18:40", "sala": "SALA 312-CCE" },
+  { "codigo": "EEE009", "nome": "TEE C - PROGRAMAÇÃO DE SISTEMAS EMBARCADOS (ENG121, ENG075)", "periodo": "Opt.", "turma": "TD", "dia": "4", "horario": "17:00-18:40", "sala": "SALA 312-CCE" },
+  { "codigo": "EEE009", "nome": "TEE C - TELECOMUNICAÇÕES EM SMART GRIDS ((ENG121,ENG075)#", "periodo": "Opt.", "turma": "TF", "dia": "3", "horario": "07:30-09:10", "sala": "3013-BL 3" },
+  { "codigo": "EEE009", "nome": "TEE C - TELECOMUNICAÇÕES EM SMART GRIDS ((ENG121,ENG075)#", "periodo": "Opt.", "turma": "TF", "dia": "5", "horario": "07:30-09:10", "sala": "3013-BL 3" },
+  { "codigo": "ELE053", "nome": "ESTABILIDADE DE SISTEMA DE ENRGIA ELÉTRICA", "periodo": "Opt.", "turma": "TEE", "dia": "5", "horario": "09:25-11:55", "sala": "3010-BL 3" },
+  { "codigo": "ELE056", "nome": "PROTEÇÃO DIGITAL DE SISTEMAS ELÉTRICOS", "periodo": "Opt.", "turma": "TB", "dia": "2", "horario": "07:30-09:10", "sala": "3012-BL 3" },
+  { "codigo": "ELE056", "nome": "PROTEÇÃO DIGITAL DE SISTEMAS ELÉTRICOS", "periodo": "Opt.", "turma": "TB", "dia": "4", "horario": "07:30-09:10", "sala": "3012-BL 3" },
+  { "codigo": "ELE057", "nome": "SUPERVISÃO E CONTROLE DE SISTEMAS DE ENERGIA ELÉTRICA(ELE055)", "periodo": "Opt.", "turma": "TEE", "dia": "3", "horario": "09:25-11:55", "sala": "3012-BL03" },
+  { "codigo": "ELE062", "nome": "DISTRIBUIÇÃO DE ENERGIA ELÉTRICA", "periodo": "Opt.", "turma": "TTAAA", "dia": "6", "horario": "07:30-10:00", "sala": "1174-BL 4" },
+  { "codigo": "ELE095", "nome": "DESCARGAS ATMOSFERIAS E PROTEÇÃO ELÉTRICA", "periodo": "Opt.", "turma": "TEE", "dia": "5", "horario": "08:20-10:00", "sala": "LRC" },
+  { "codigo": "ELE095", "nome": "DESCARGAS ATMOSFERIAS E PROTEÇÃO ELÉTRICA", "periodo": "Opt.", "turma": "TEE", "dia": "6", "horario": "10:15-11:55", "sala": "LRC" },
+  { "codigo": "ELE614", "nome": "TÉCNICAS DE ALTA TENSÃO", "periodo": "Opt.", "turma": "TEE", "dia": "4", "horario": "09:25-11:55", "sala": "3011-BL 3" },
+  { "codigo": "ELT012", "nome": "AUTOMAÇÃO EM TEMPO REAL (ELT127)", "periodo": "Opt.", "turma": "TB", "dia": "3", "horario": "19:00-20:40", "sala": "NÃO 2024/2" },
+  { "codigo": "ELT012", "nome": "AUTOMAÇÃO EM TEMPO REAL (ELT127)", "periodo": "Opt.", "turma": "TB", "dia": "5", "horario": "20:55-22:35", "sala": "NÃO 2024/2" },
+  { "codigo": "ELT046", "nome": "ANTENAS", "periodo": "Opt.", "turma": "PL1", "dia": "6", "horario": "10:15-11:55", "sala": "LABORATÓRIO" },
+  { "codigo": "ELT046", "nome": "ANTENAS (ENG121)", "periodo": "Opt.", "turma": "TA", "dia": "6", "horario": "07:30-10:00", "sala": "1024-BL03" },
+  { "codigo": "ELT083", "nome": "SISTEMAS DIGITAIS", "periodo": "Opt.", "turma": "B", "dia": "5", "horario": "09:25-11:55", "sala": "OFERTADA ?" },
+  { "codigo": "ELT618", "nome": "LABORATÓRIO DE PROJETOS COM AMPLIFICADORES OPERACIONAIS E CIRCUITOS ANALÓGICOS INTEGRADOS(ENG075, ENG121)", "periodo": "Opt.", "turma": "PA", "dia": "3", "horario": "13:00-16:30", "sala": "LABORATÓRIO" },
+  { "codigo": "ELT618", "nome": "LABORATÓRIO DE PROJETOS COM AMPLIFICADORES OPERACIONAIS E CIRCUITOS ANALÓGICOS INTEGRADOS(ENG075, ENG121)", "periodo": "Opt.", "turma": "TEO", "dia": "3", "horario": "13:00-16:30", "sala": "Ñ 24/2" },
+  { "codigo": "ELT619", "nome": "MULTIMÍDIA SOBRE IP - NULL (ENG075,ENG121)", "periodo": "Opt.", "turma": "TA", "dia": "6", "horario": "07:30-11:05", "sala": "3012-BL 3" },
+  { "codigo": "ELT048", "nome": "COMUNICAÇÕES MÓVEIS (ELT121, ENG075)", "periodo": "Opt.", "turma": "TA", "dia": "2", "horario": "07:30-09:10", "sala": "1023-BL 3" },
+  { "codigo": "ELT048", "nome": "COMUNICAÇÕES MÓVEIS (ELT121, ENG075)", "periodo": "Opt.", "turma": "TA", "dia": "4", "horario": "07:30-09:10", "sala": "1023-BL 3" },
+  { "codigo": "ELT047", "nome": "COMUNICAÇÕES DIGITAIS (ENG075)", "periodo": "Opt.", "turma": "TB", "dia": "3", "horario": "09:25-11:05", "sala": "NÃO 2025/2" },
+  { "codigo": "ELT047", "nome": "COMUNICAÇÕES DIGITAIS (ENG075)", "periodo": "Opt.", "turma": "TB", "dia": "5", "horario": "09:25-11:05", "sala": "NÃO 2025/2" },
+  { "codigo": "ELT049", "nome": "COMUNICAÇÕES ÓPTICAS(ENG075,121)", "periodo": "Opt.", "turma": "TA", "dia": "4", "horario": "09:25-11:05", "sala": "NÃO 2025/1" },
+  { "codigo": "ELT049", "nome": "COMUNICAÇÕES ÓPTICAS(ENG075,121)", "periodo": "Opt.", "turma": "TA", "dia": "6", "horario": "09:25-11:05", "sala": "NÃO 2025/1" },
+  { "codigo": "ELT051", "nome": "PROPAGAÇÃO DE ONDAS DE RÁDIO", "periodo": "Opt.", "turma": "TA", "dia": "3", "horario": "07:30-09:10", "sala": "1033-BL 3" },
+  { "codigo": "ELT051", "nome": "PROPAGAÇÃO DE ONDAS DE RÁDIO", "periodo": "Opt.", "turma": "TA", "dia": "5", "horario": "07:30-09:10", "sala": "1033-BL 3" },
+  { "codigo": "ELT091", "nome": "REDES TCP/IP (ENG121,ENG075)", "periodo": "Opt.", "turma": "TEE", "dia": "4", "horario": "09:25-11:05", "sala": "1162-BL 4" },
+  { "codigo": "ELT091", "nome": "REDES TCP/IP (ENG121,ENG075)", "periodo": "Opt.", "turma": "TEE", "dia": "6", "horario": "09:25-11:05", "sala": "1162-BL 4" },
+  { "codigo": "ELT134", "nome": "LABORATÓRIO DE ARQUITETURA E ORGANIZAÇÃO DE COMPUTADORES[1*]", "periodo": "Opt.", "turma": "PAD", "dia": "2", "horario": "17:00-18:40", "sala": "NÃO 2024/2 LABORATÓRIO(1101-BL01)" },
+  { "codigo": "ELE002", "nome": "ATERRAMENTOS ELÉTRICOS", "periodo": "Opt.", "turma": "TB", "dia": "5", "horario": "08:20-10:00", "sala": "LRC" },
+  { "codigo": "ELE002", "nome": "ATERRAMENTOS ELÉTRICOS", "periodo": "Opt.", "turma": "TB", "dia": "6", "horario": "10:15-11:05", "sala": "LRC" },
+  { "codigo": "ELE002", "nome": "ATERRAMENTOS ELÉTRICOS", "periodo": "Opt.", "turma": "PL1", "dia": "6", "horario": "11:55-12:45", "sala": "LAB." },
+  { "codigo": "ELE002", "nome": "ATERRAMENTOS ELÉTRICOS", "periodo": "Opt.", "turma": "PL2", "dia": "6", "horario": "11:05-11:55", "sala": "LAB." },
+  { "codigo": "ELE052", "nome": "COORDENAÇÃO DE ISOLAMENTO", "periodo": "Opt.", "turma": "TB", "dia": "4", "horario": "09:25-11:05", "sala": "3015-BL 3" },
+  { "codigo": "ELE047", "nome": "TECNOLOGIA DE MÁQUINAS ELÉTRICAS", "periodo": "Opt.", "turma": "TA", "dia": "5", "horario": "07:30-11:05", "sala": "NÃO 2024/2" },
+  { "codigo": "ELE055", "nome": "PLANEJAMENTO DE SISTEMAS DE ENERGIA ELÉTRICA(ELE057)", "periodo": "Opt.", "turma": "TTBB", "dia": "3", "horario": "09:25-11:55", "sala": "3012-BL 3" },
+  { "codigo": "ELE045", "nome": "GERAÇÃO DE ENERGIA ELÉTRICA", "periodo": "Opt.", "turma": "TTB", "dia": "3", "horario": "09:25-11:05", "sala": "A213-CAD3-CAD3" },
+  { "codigo": "ELE045", "nome": "GERAÇÃO DE ENERGIA ELÉTRICA", "periodo": "Opt.", "turma": "TTB", "dia": "5", "horario": "09:25-11:05", "sala": "A213-CAD3-CAD3" },
+  { "codigo": "ELE059", "nome": "FUNDAMENTOS DE ENGANHARIA BIOMÉDICA(ENG121)", "periodo": "Opt.", "turma": "TTTB", "dia": "3", "horario": "09:25-11:05", "sala": "1032-BL 3" },
+  { "codigo": "ELE059", "nome": "FUNDAMENTOS DE ENGANHARIA BIOMÉDICA(ENG121)", "periodo": "Opt.", "turma": "TTTB", "dia": "5", "horario": "09:25-11:05", "sala": "1023-BL 3" },
+  { "codigo": "EEE024", "nome": "FUNDAMENTOS DE ENERGIA ALTERNATIVA (ENG110)", "periodo": "Opt.", "turma": "TTTBB", "dia": "2", "horario": "16:50-18:30", "sala": "1032-BL 3" },
+  { "codigo": "ENG158", "nome": "TÓPICOS EM ENGENHARIA A", "periodo": "Opt.", "turma": "A", "dia": "6", "horario": "16:50-18:30", "sala": "NÃO 2024/2" },
+  { "codigo": "EEE006", "nome": "TECNOLOGIA DISPOSITIVOS SEMICONDUTORES", "periodo": "Opt.", "turma": "TTTT", "dia": "4", "horario": "14:50-16:30", "sala": "2298-BL 4" },
+  { "codigo": "EEE025", "nome": "INSTRUMENTAÇÃO BIOMÉDICA", "periodo": "Opt.", "turma": "TTAAA", "dia": "3", "horario": "13:00-14:40", "sala": "2026-BL 3" },
+  { "codigo": "EEE025", "nome": "INSTRUMENTAÇÃO BIOMÉDICA", "periodo": "Opt.", "turma": "TTAAA", "dia": "5", "horario": "13:00-14:40", "sala": "2026-BL 3" },
+  { "codigo": "EEE027", "nome": "PROJETO DE SISTEMAS VLSI (ENG121)", "periodo": "Opt.", "turma": "TTTA", "dia": "4", "horario": "13:00-14:40", "sala": "1177-BL 4" },
+  { "codigo": "EEE027", "nome": "PROJETO DE SISTEMAS VLSI (ENG121)", "periodo": "Opt.", "turma": "TTTA", "dia": "6", "horario": "13:00-14:40", "sala": "1177-BL 4" },
+  { "codigo": "ELE048", "nome": "VEICULOS ELÉTRICOS E HÍBRIDOS(ENG033)", "periodo": "Opt.", "turma": "TTTT", "dia": "2", "horario": "17:00-18:40", "sala": "NÃO 2025/1" },
+  { "codigo": "ELE048", "nome": "VEICULOS ELÉTRICOS E HÍBRIDOS(ENG033)", "periodo": "Opt.", "turma": "TTTT", "dia": "4", "horario": "17:00-18:40", "sala": "NÃO 2025/1" },
+  { "codigo": "EEE009", "nome": "TEE - ELÉTRICA C - FUNDAMENTOS E APLICAÇÕES DE SISTEMAS ÓPTICOS(ENG121, ELE164)", "periodo": "Opt.", "turma": "TEEE", "dia": "4", "horario": "15:30-19:00", "sala": "NÃO 2026/1" },
+  { "codigo": "ENG030", "nome": "ESTUDOS AVANÇADOS PÓS-GRADUAÇÃO - PLANEJAMENTO E ANÁLISE DE EXPERIMENTOS (ENG075, ENG121)", "periodo": "Opt.", "turma": "P12", "dia": "3", "horario": "17:00-20:30", "sala": "LAB." },
+  { "codigo": "EEE009", "nome": "TEE - ELÉTRICA C - TÓPICOS EM ANÁLISE E PROCESSAMENTO DE SINAIS ACÚSTICOS", "periodo": "Opt.", "turma": "TAPSA", "dia": "2", "horario": "13:00-14:40", "sala": "NÃO 2024/2" },
+  { "codigo": "EEE009", "nome": "TEE - ELÉTRICA C - TÓPICOS EM ANÁLISE E PROCESSAMENTO DE SINAIS ACÚSTICOS", "periodo": "Opt.", "turma": "TAPSA", "dia": "4", "horario": "13:00-14:40", "sala": "NÃO 2024/2" },
+  { "codigo": "EEE009", "nome": "TEE - ELÉTRICA C - AMPLIFICADORES DE ÁUDIO E TRANSDUTORES ELETROACÚSTICOS", "periodo": "Opt.", "turma": "TC", "dia": "4", "horario": "09:25-11:05", "sala": "NÃO 2024/2" },
+  { "codigo": "EEE009", "nome": "TEE - ELÉTRICA C - AMPLIFICADORES DE ÁUDIO E TRANSDUTORES ELETROACÚSTICOS", "periodo": "Opt.", "turma": "TC", "dia": "6", "horario": "09:25-11:05", "sala": "NÃO 2024/2" },
+  { "codigo": "EEE009", "nome": "TEE - ELÉTRICA C - PROCESSAMENTO DIGITAL DE IMAGENS (ENG075,ENG121)", "periodo": "Opt.", "turma": "TEE", "dia": "3", "horario": "09:25-11:05", "sala": "NÃO OFERTADA 2026/1" },
+  { "codigo": "EEE009", "nome": "TEE - ELÉTRICA C - PROCESSAMENTO DIGITAL DE IMAGENS (ENG075,ENG121)", "periodo": "Opt.", "turma": "TEE", "dia": "5", "horario": "09:25-11:05", "sala": "NÃO OFERTADA 2026/1" },
+  { "codigo": "EEE009", "nome": "TEE - ELÉTRICA C - PLANEJAMENTO DE ANÁLISE DE EXPERIMENTOS", "periodo": "Opt.", "turma": "TPAE", "dia": "3", "horario": "17:00-18:40", "sala": "NÃO 2024/2" },
+  { "codigo": "EEE009", "nome": "TEE - ELÉTRICA C - PLANEJAMENTO DE ANÁLISE DE EXPERIMENTOS", "periodo": "Opt.", "turma": "TPAE", "dia": "5", "horario": "17:00-18:40", "sala": "NÃO 2024/2" },
+  { "codigo": "EEE009", "nome": "TEE - ELÉTRICA C - SIMULAÇÃO EM TEMPO REAL E PROJETO EM ELETRÔNICA DE POTÊNCIA", "periodo": "Opt.", "turma": "TTG", "dia": "4", "horario": "07:30-11:05", "sala": "1024-BL 3" },
+  { "codigo": "ELE074", "nome": "MODELAGEM E SIMULAÇÃO DE SISTEMAS A EVENTOS DISCRETOS(ENG121,EEE046))", "periodo": "Opt.", "turma": "TEE", "dia": "3", "horario": "20:55-22:35", "sala": "NÃO 2024/2" },
+  { "codigo": "ELE074", "nome": "MODELAGEM E SIMULAÇÃO DE SISTEMAS A EVENTOS DISCRETOS(ENG121,EEE046))", "periodo": "Opt.", "turma": "TEE", "dia": "5", "horario": "19:00-20:40", "sala": "NÃO 2024/2" },
+  { "codigo": "ELT010", "nome": "INSTRUMENTAÇÃO INDUSTRIAL(ELT028)", "periodo": "Opt.", "turma": "TA", "dia": "2", "horario": "14:55-16:35", "sala": "NÃO 2024/2" },
+  { "codigo": "ELT010", "nome": "INSTRUMENTAÇÃO INDUSTRIAL(ELT028)", "periodo": "Opt.", "turma": "TA", "dia": "4", "horario": "16:50-18:30", "sala": "NÃO 2024/2" },
+  { "codigo": "ELT010", "nome": "INSTRUMENTAÇÃO INDUSTRIAL(ELT028)", "periodo": "Opt.", "turma": "TB", "dia": "2", "horario": "19:00-20:40", "sala": "NÃO 2024/2" },
+  { "codigo": "ELT010", "nome": "INSTRUMENTAÇÃO INDUSTRIAL(ELT028)", "periodo": "Opt.", "turma": "TB", "dia": "4", "horario": "20:55-22:35", "sala": "NÃO 2024/2" },
+  { "codigo": "ELT018", "nome": "INTRODUÇÃO AO CONTROLE ADAPTATIVO", "periodo": "Opt.", "turma": "TA", "dia": "3", "horario": "19:00-20:40", "sala": "NÃO 2024/2" },
+  { "codigo": "ELT050", "nome": "MICROONDAS", "periodo": "Opt.", "turma": "TA", "dia": "2", "horario": "07:30-09:10", "sala": "NÃO 2024/2" },
+  { "codigo": "ELT050", "nome": "MICROONDAS", "periodo": "Opt.", "turma": "TA", "dia": "4", "horario": "07:30-09:10", "sala": "NÃO 2024/2" },
+  { "codigo": "EEE009", "nome": "TEE ELÉTRICA C - PROJETOS E INOVAÇÕES EM ENGENHARIA DE REABILITAÇÃO E TECNOLOGIAS ASSISTIVAS(ENG075, ENG121))", "periodo": "Opt.", "turma": "TI", "dia": "3", "horario": "13:00-14:40", "sala": "SALA 3010-BLOCO 3" },
+  { "codigo": "EEE009", "nome": "TEE ELÉTRICA C - PROJETOS E INOVAÇÕES EM ENGENHARIA DE REABILITAÇÃO E TECNOLOGIAS ASSISTIVAS(ENG075, ENG121))", "periodo": "Opt.", "turma": "TI", "dia": "5", "horario": "13:00-14:40", "sala": "SALA 3010-BLOCO 3" },
+  { "codigo": "ELE051", "nome": "AUTOMAÇÃO DE SISTEMAS ELÉTRICOS DE POTÊNCIA", "periodo": "Opt.", "turma": "TB", "dia": "6", "horario": "07:30-10:00", "sala": "2298-BL 4" },
+  { "codigo": "ELE618", "nome": "SISTEMAS ELÉTRICOS INDUSTRIAIS", "periodo": "Opt.", "turma": "PTAA", "dia": "5", "horario": "13:00-16:35", "sala": "NÃO 2024/2" },
+  { "codigo": "UNI296", "nome": "SEMINÁRIOS NO ECOSSISTEMA DE EMPREENDEDORISMO E INOVAÇÃO", "periodo": "Opt.", "turma": "TA", "dia": "Sáb.", "horario": "09:00-10:40", "sala": "2298-BL 4" },
+  { "codigo": "ENG030", "nome": "ESTUDOS AVANÇADOS PÓS-GRADUAÇÃO - FUNDAMENTOS DO CONTROLE ROBUSTO VIA OTIMIZAÇÃO", "periodo": "Opt.", "turma": "PE", "dia": "4", "horario": "08:00-11:35", "sala": "PPGEE" },
+  { "codigo": "ENG030", "nome": "ESTUDOS AVANÇADOS PÓS-GRADUAÇÃO - CONTROLE DE ACIONAMENTOS ELÉTRICOS (ENG121, ENG075)", "periodo": "Opt.", "turma": "P15", "dia": "2", "horario": "13:00-17:10", "sala": "PPGEE" },
+  { "codigo": "EEE009", "nome": "TOPICOS EM ENGENHARIA ELETRICA C - CONTROLE EM TEMPO REAL USANDO DSPS(ELT056)", "periodo": "Opt.", "turma": "TI", "dia": "4", "horario": "07:30-11:05", "sala": "1174-BL04" },
+  { "codigo": "EEE009", "nome": "TOPICOS EM ENGENHARIA ELETRICA C - MICROTRANSDUTORES (ENG075,ENG121)", "periodo": "Opt.", "turma": "TTH", "dia": "4", "horario": "14:55-16:35", "sala": "NÃO 2025/1" },
+  { "codigo": "EEE009", "nome": "TOPICOS EM ENGENHARIA ELETRICA C - MICROTRANSDUTORES (ENG075,ENG121)", "periodo": "Opt.", "turma": "TTH", "dia": "6", "horario": "14:55-16:35", "sala": "NÃO 2025/1" },
+  { "codigo": "ENG030", "nome": "ESTUDOS AVANÇADOS PÓS-GRADUAÇÃO - OTIMIZAÇÃO EM REDES (ENG121, ENG075)", "periodo": "Opt.", "turma": "P34", "dia": "5", "horario": "17:00-20:35", "sala": "Lab." },
+  { "codigo": "ENG030", "nome": "TOPICOS EM ENGENHARIA DE CONTROLE E AUTOMACAO IV - [PPGEE] ANÁLISE DE REDES ELÉTRICAS NO DOMÍNIO DA FREQUÊNCIA (ENG075,ENG121)", "periodo": "Opt.", "turma": "P29", "dia": "3", "horario": "13:00-16:30", "sala": "LAB." },
+  { "codigo": "ENG030", "nome": "ESTUDOS AVANÇADOS PÓS-GRADUAÇÃO: COMPUTAÇÃO EVOLUCIONÁRIA (ENG121, ENG075)", "periodo": "Opt.", "turma": "P24", "dia": "3", "horario": "17:00-20:30", "sala": "LAB." },
+  { "codigo": "ENG030", "nome": "ESTUDOS AVANÇADOS PÓS-GRADUAÇÃO - OTIMIZAÇÃO EM ENGENHARIA ELÉTRICA (ENG075, ENG121)", "periodo": "Opt.", "turma": "P16", "dia": "4", "horario": "07:30-11:05", "sala": "LAB." },
+  { "codigo": "ENG030", "nome": "ESTUDOS AVANÇADOS PÓS-GRADUAÇÃO - APLICAÇÕES DE ELETRÔNICA DE POTÊNCIA EM SISTEMAS ELÉTRICOS DE POTÊNCIA (ENG075)", "periodo": "Opt.", "turma": "P25", "dia": "5", "horario": "14:55-16:35", "sala": "LAB." },
+  { "codigo": "ENG030", "nome": "ESTUDOS AVANÇADOS PÓS-GRADUAÇÃO - IMPACTO DE GERAÇÃO DISTRIBUÍDA NAS REDES ELÉTRICAS (ENG075)", "periodo": "Opt.", "turma": "P36", "dia": "3", "horario": "13:00-16:30", "sala": "LAB." },
+  { "codigo": "EEE009", "nome": "TOPICOS EM ENGENHARIA ELETRICA C - LABORATÓRIO DE ELETRÔNICA EMBARCADA", "periodo": "Opt.", "turma": "TM", "dia": "5", "horario": "14:55-18:30", "sala": "2296-BL 4" },
+  { "codigo": "EEE009", "nome": "TOPICOS EM ENGENHARIA ELETRICA C - PROCESSAMENTO DE SINAIS E IMAGENS POR DICIONÁRIOS SOBRE-COMPLETOS E REPRESENTAÇÕES ESPARSAS", "periodo": "Opt.", "turma": "TN", "dia": "3", "horario": "13:00-14:40", "sala": "1034-BL 3" },
+  { "codigo": "EEE009", "nome": "TOPICOS EM ENGENHARIA ELETRICA C - PROCESSAMENTO DE SINAIS E IMAGENS POR DICIONÁRIOS SOBRE-COMPLETOS E REPRESENTAÇÕES ESPARSAS", "periodo": "Opt.", "turma": "TN", "dia": "5", "horario": "13:00-14:40", "sala": "1034-BL 3" },
+  { "codigo": "EEE009", "nome": "TOPICOS EM ENGENHARIA ELETRICA C - PROCESSOS E EQUIPAMENTOS EM MICROELETRÔNICA", "periodo": "Opt.", "turma": "TJ", "dia": "4", "horario": "14:50-18:30", "sala": "1022-BL 3" },
+  { "codigo": "EEE009", "nome": "TOPICOS EM ENGENHARIA DE CONTROLE E AUTOMACAO IV - FUNDAMENTOS DE VEÍCULOS AUTÔNOMOS (ENG075)", "periodo": "Opt.", "turma": "TL", "dia": "3", "horario": "19:00-20:40", "sala": "1029-BL3" },
+  { "codigo": "EEE009", "nome": "TOPICOS EM ENGENHARIA DE CONTROLE E AUTOMACAO IV - FUNDAMENTOS DE VEÍCULOS AUTÔNOMOS (ENG075)", "periodo": "Opt.", "turma": "TL", "dia": "5", "horario": "19:00-20:40", "sala": "1029-BL3" },
+  { "codigo": "ENG030", "nome": "ESTUDOS AVANÇADOS PÓS-GRADUAÇÃO - PROJETOS VLSI", "periodo": "Opt.", "turma": "P20", "dia": "4", "horario": "13:00-14:40", "sala": "1177-BL04" },
+  { "codigo": "ENG030", "nome": "ESTUDOS AVANÇADOS PÓS-GRADUAÇÃO - PROJETOS VLSI", "periodo": "Opt.", "turma": "P20", "dia": "6", "horario": "13:00-14:40", "sala": "1177-BL04" },
+  { "codigo": "ENG030", "nome": "ESTUDOS AVANÇADOS PÓS-GRADUAÇÃO - ANÁLISE DE REDES ELÉTRICAS NO DOMÍNIO DO TEMPO(ENG121,ENG075)", "periodo": "Opt.", "turma": "P2", "dia": "2", "horario": "17:00-20:40", "sala": "LAB." },
+  { "codigo": "ENG030", "nome": "ESTUDOS AVANÇADOS PÓS-GRADUAÇÃO - CARACTERIZAÇÃO DE CANAIS DE RÁDIO(ENG075,ENG121)", "periodo": "Opt.", "turma": "PB", "dia": "2", "horario": "07:30-09:10", "sala": "LAB." },
+  { "codigo": "ENG030", "nome": "ESTUDOS AVANÇADOS PÓS-GRADUAÇÃO - CARACTERIZAÇÃO DE CANAIS DE RÁDIO(ENG075,ENG121)", "periodo": "Opt.", "turma": "PB", "dia": "4", "horario": "07:30-09:10", "sala": "LAB." },
+  { "codigo": "ENG030", "nome": "ESTUDOS AVANÇADOS PÓS-GRADUAÇÃO - CONSTRAINED ROBOTIC CONTROL (DISCIPLINA EM INGLÊS)(ENG121, ENG075)", "periodo": "Opt.", "turma": "P23", "dia": "2", "horario": "16:50-18:40", "sala": "LAB." },
+  { "codigo": "ENG030", "nome": "ESTUDOS AVANÇADOS PÓS-GRADUAÇÃO - MICRORREDES E REDES ATIVAS DE DISTRIBUIÇÃO (ENG075,ENG121)", "periodo": "Opt.", "turma": "P13", "dia": "5", "horario": "13:00-16:30", "sala": "LAB." },
+  { "codigo": "ENG030", "nome": "ESTUDOS AVANÇADOS PÓS-GRADUAÇÃO - CONTROLE DE MICRORREDES DE ENERGIA ELÉTRICA (ENG075,ENG121)", "periodo": "Opt.", "turma": "P21", "dia": "3", "horario": "07:30-11:05", "sala": "LAB." },
+  { "codigo": "ENG030", "nome": "ESTUDOS AVANÇADOS PÓS-GRADUAÇÃO - CONVERSORES ESTÁTICOS TRIFÁSICOS DE MÉDIA TENSÃO (ENG075)", "periodo": "Opt.", "turma": "P17", "dia": "2", "horario": "13:30-17:10", "sala": "LAB" },
+  { "codigo": "ENG030", "nome": "ESTUDOS AVANÇADOS PÓS-GRADUAÇÃO - DINÂMICA DE MOTORES ELÉTRICOS(ENG075,ENG121)", "periodo": "Opt.", "turma": "P9", "dia": "4", "horario": "08:20-12:00", "sala": "LAB" },
+  { "codigo": "ENG030", "nome": "ESTUDOS AVANÇADOS PÓS-GRADUAÇÃO - FUNDAMENTOS DE CONTROLE NÃO LINEAR(ENG121)", "periodo": "Opt.", "turma": "P24", "dia": "5", "horario": "15:00-18:30", "sala": "LAB" },
+  { "codigo": "ENG030", "nome": "ESTUDOS AVANÇADOS PÓS-GRADUAÇÃO - IDENTIFICAÇÃO DE SISTEMAS E ESTIMAÇÃO DE PARÂMETROS(ENG075,ENG121)", "periodo": "Opt.", "turma": "PY", "dia": "2", "horario": "15:00-18:30", "sala": "LAB" },
+  { "codigo": "ENG030", "nome": "ESTUDOS AVANÇADOS PÓS-GRADUAÇÃO - INTRODUÇÃO À INTELIGÊNCIA COMPUTACIONAL(ENG075,ENG121)", "periodo": "Opt.", "turma": "P19", "dia": "3", "horario": "15:00-18:30", "sala": "LAB" },
+  { "codigo": "ENG030", "nome": "ESTUDOS AVANÇADOS PÓS-GRADUAÇÃO - INTRODUÇÃO AOS PROCESSOS ESTOCÁSTICOS (ENG075,ENG121)", "periodo": "Opt.", "turma": "P6", "dia": "3", "horario": "13:00-16:30", "sala": "LAB" },
+  { "codigo": "ENG030", "nome": "ESTUDOS AVANÇADOS PÓS-GRADUAÇÃO - MÉTODOS DE ELEMENTOS FINITOS (ENG075,ENG121)", "periodo": "Opt.", "turma": "P3", "dia": "3", "horario": "14:00-15:40", "sala": "LAB" },
+  { "codigo": "ENG030", "nome": "ESTUDOS AVANÇADOS PÓS-GRADUAÇÃO - MÉTODOS DE ELEMENTOS FINITOS (ENG075,ENG121)", "periodo": "Opt.", "turma": "P3", "dia": "5", "horario": "14:00-15:40", "sala": "LAB" },
+  { "codigo": "ENG030", "nome": "ESTUDOS AVANÇADOS PÓS-GRADUAÇÃO - MODELAGEM ELETROMAGNÉTICA PARA SISTEMAS ELÉTRICOS DE POTÊNCIA (ENG075,ENG121)", "periodo": "Opt.", "turma": "P10", "dia": "5", "horario": "13:00-16:30", "sala": "LAB." },
+  { "codigo": "ENG030", "nome": "ESTUDOS AVANÇADOS PÓS-GRADUAÇÃO - OPERAÇÃO DE MERCADOS DE ENERGIA ELÉTRICA (ENG121)", "periodo": "Opt.", "turma": "P14", "dia": "3", "horario": "08:20-11:55", "sala": "LAB" },
+  { "codigo": "ENG030", "nome": "ESTUDOS AVANÇADOS PÓS-GRADUAÇÃO - OTIMIZAÇÃO MULTIOBJETIVO (ENG075,ENG121)", "periodo": "Opt.", "turma": "P11", "dia": "5", "horario": "17:00-20:35", "sala": "LAB" },
+  { "codigo": "ENG030", "nome": "ESTUDOS AVANÇADOS PÓS-GRADUAÇÃO - PROCESSAMENTO DE SINAIS (ENG075,ENG121)", "periodo": "Opt.", "turma": "P4", "dia": "5", "horario": "13:50-17:30", "sala": "LAB" },
+  { "codigo": "ENG030", "nome": "ESTUDOS AVANÇADOS PÓS-GRADUAÇÃO - REDES NEURAIS ARTIFICIAIS: TEORIA E APLICAÇÕES (ENG075,ENG121)", "periodo": "Opt.", "turma": "P7", "dia": "2", "horario": "13:00-16:30", "sala": "LAB" },
+  { "codigo": "ENG030", "nome": "ESTUDOS AVANÇADOS PÓS-GRADUAÇÃO - SIMULAÇÃO DE SISTEMAS DINÂMICOS A EVENTOS DISCRETOS (ENG075,ENG121)", "periodo": "Opt.", "turma": "P18", "dia": "2", "horario": "14:55-18:30", "sala": "LAB" },
+  { "codigo": "ENG030", "nome": "ESTUDOS AVANÇADOS PÓS-GRADUAÇÃO - SISTEMAS DE ENERGIA ININTERRUPTA (ENG075,ENG121)", "periodo": "Opt.", "turma": "P5", "dia": "5", "horario": "07:30-11:05", "sala": "LAB" },
+  { "codigo": "ENG030", "nome": "ESTUDOS AVANÇADOS PÓS-GRADUAÇÃO - SYSTEM-ON-CHIP (PROCESSADORES E LÓGICA PROGRAMÁVEL)", "periodo": "Opt.", "turma": "P25", "dia": "5", "horario": "14:45-18:25", "sala": "LAB" },
+  { "codigo": "ENG030", "nome": "ESTUDOS AVANÇADOS PÓS-GRADUAÇÃO - TÉCNICAS DE CONTROLE NÃO LINEAR (ENG075,ENG121)", "periodo": "Opt.", "turma": "PT", "dia": "3", "horario": "13:20-16:50", "sala": "LAB" },
+  { "codigo": "ENG030", "nome": "ESTUDOS AVANÇADOS PÓS-GRADUAÇÃO - TECNOLOGIA DE FONTES DE ALIMENTAÇÃO (ENG075,ENG121)", "periodo": "Opt.", "turma": "PN", "dia": "6", "horario": "08:20-11:40", "sala": "LAB" },
+  { "codigo": "ENG030", "nome": "ESTUDOS AVANÇADOS PÓS-GRADUAÇÃO - TEORIA DE SISTEMAS LINEARES I (ENG121)", "periodo": "Opt.", "turma": "P1", "dia": "2", "horario": "07:30-11:05", "sala": "LAB" },
+  { "codigo": "ENG030", "nome": "ESTUDOS AVANÇADOS PÓS-GRADUAÇÃO - ANÁLISE DE ANTENAS (ENG075,ENG121)", "periodo": "Opt.", "turma": "PX", "dia": "2", "horario": "09:25-11:05", "sala": "LAB" },
+  { "codigo": "DCC603", "nome": "ENGENHARIA DE SOFTWARE", "periodo": "Opt.", "turma": "TW/TZ", "dia": "2", "horario": "17:00-18:40", "sala": "A209-CAD3-CAD3" },
+  { "codigo": "DCC603", "nome": "ENGENHARIA DE SOFTWARE", "periodo": "Opt.", "turma": "TW/TZ", "dia": "4", "horario": "17:00-18:40", "sala": "A209-CAD3-CAD3" },
+  { "codigo": "EEE037", "nome": "TOPICOS EM SISTEMAS DE ENERGIA ELETRICA A - LABORATÓRIO DE PROTEÇÃO E AUTOMAÇÃO DE SISTEMAS ELÉTRICOS", "periodo": "Opt.", "turma": "TB", "dia": "2", "horario": "07:20-09:10", "sala": "1174-BL 4" },
+  { "codigo": "EEE037", "nome": "TOPICOS EM SISTEMAS DE ENERGIA ELETRICA A - LABORATÓRIO DE PROTEÇÃO E AUTOMAÇÃO DE SISTEMAS ELÉTRICOS", "periodo": "Opt.", "turma": "TB", "dia": "4", "horario": "07:30-09:10", "sala": "1030-BL 3" },
+  { "codigo": "EEE030", "nome": "TOPICOS EM COMPUTACAO C - TEORIA DA INFORMAÇÃO", "periodo": "Opt.", "turma": "TA", "dia": "6", "horario": "07:30-11:05", "sala": "NÃO OFERTADA 1/2026" },
+  { "codigo": "EEE007", "nome": "TOPICOS EM ENGENHARIA ELETRICA A - INTRODUÇÃO AO CONTROLE AUTOMÁTICO DE AERONAVES", "periodo": "Opt.", "turma": "TG", "dia": "2", "horario": "17:00-18:40", "sala": "1034-BL 3" },
+  { "codigo": "EEE007", "nome": "TOPICOS EM ENGENHARIA ELETRICA A - PROGRAMAÇÃO AVANÇADA DE CLP", "periodo": "Opt.", "turma": "TH", "dia": "3", "horario": "16:50-18:30", "sala": "1031-BL 3" },
+  { "codigo": "EEE007", "nome": "TOPICOS EM ENGENHARIA ELETRICA A - DESCOBERTAS DE ENGENHARIA ELÉTRICA QUE MOLDARAM A SOCIEDADE CONTEMPORÂNEA", "periodo": "Opt.", "turma": "TI", "dia": "4", "horario": "19:00-20:40", "sala": "1034-BL 3" },
+  { "codigo": "ENG030", "nome": "ESTUDOS AVANÇADOS PÓS-GRADUAÇÃO - TÓPICOS ESPECIAIS EM SINAIS E SISTEMAS: PLANEJAMENTO DE MOVIMENTO DE ROBÔS", "periodo": "Pós", "turma": "PS", "dia": "6", "horario": "14:00-17:20", "sala": "LAB" },
+  { "codigo": "ENG030", "nome": "ESTUDOS AVANÇADOS PÓS-GRADUAÇÃO - TÉCNICAS DE CONTROLE DE CONVERSORES ESTÁTICOS DE POTÊNCIA", "periodo": "Pós", "turma": "P6", "dia": "4", "horario": "07:30-11:05", "sala": "LAB" },
+  { "codigo": "ENG030", "nome": "ESTUDOS AVANÇADOS PÓS-GRADUAÇÃO - TÉCNICAS CLÁSSICAS DE RECONHECIMENTO DE PADRÕES", "periodo": "Pós", "turma": "P5", "dia": "2", "horario": "13:00-16:35", "sala": "LAB" },
+  { "codigo": "ENG030", "nome": "ESTUDOS AVANÇADOS PÓS-GRADUAÇÃO - TÓPICOS ESPECIAIS EM SINAIS E SISTEMAS: INTRODUCTION TO GENERATIVE AI", "periodo": "Pós", "turma": "P45", "dia": "2", "horario": "16:50-18:30", "sala": "LAB" },
+  { "codigo": "ENG030", "nome": "ESTUDOS AVANÇADOS PÓS-GRADUAÇÃO - TÓPICOS ESPECIAIS EM SINAIS E SISTEMAS: INTRODUCTION TO GENERATIVE AI", "periodo": "Pós", "turma": "P45", "dia": "4", "horario": "16:50-18:30", "sala": "LAB" },
+  { "codigo": "ENG030", "nome": "ESTUDOS AVANÇADOS PÓS-GRADUAÇÃO - TÓPICOS ESPECIAIS EM SINAIS E SISTEMAS: ROBÓTICA PROBABILÍSTICA", "periodo": "Pós", "turma": "P44", "dia": "3", "horario": "13:00-16:35", "sala": "LAB" },
+  { "codigo": "ENG030", "nome": "ESTUDOS AVANÇADOS PÓS-GRADUAÇÃO - TÓPICOS ESPECIAIS EM ENGENHARIA DE POTÊNCIA: IMPACTOS DE GERAÇÃO DISTRIBUÍDA NAS REDE ELÉTRICAS", "periodo": "Pós", "turma": "P43", "dia": "4", "horario": "08:00-11:40", "sala": "LAB" },
+  { "codigo": "ENG030", "nome": "ESTUDOS AVANÇADOS PÓS-GRADUAÇÃO - TÓPICOS ESPECIAIS EM ENGENHARIA DE COMPUTAÇÃO E TELECOMUNICAÇÕES: TEORIA DA INFORMAÇÃO", "periodo": "Pós", "turma": "P42", "dia": "2", "horario": "07:30-11:05", "sala": "LAB" },
+  { "codigo": "EEE901", "nome": "INTRODUÇÃO À INTELIGÊNCIA COMPUTACIONAL", "periodo": "Pós", "turma": "A", "dia": "3", "horario": "15:30-18:00", "sala": "2004-BL 3" },
+  { "codigo": "EEE049", "nome": "APRENDIZADO DE MÁQUINA", "periodo": "Sem Per.", "turma": "TADM", "dia": "3", "horario": "19:00-20:40", "sala": "3014-BL 3" },
+  { "codigo": "EEE049", "nome": "APRENDIZADO DE MÁQUINA", "periodo": "Sem Per.", "turma": "TADM", "dia": "5", "horario": "20:55-22:35", "sala": "3014-BL 3" }
+
+         
         ];
-        
+
+        // Se você for usar um arquivo externo (dados_salas.json), você fará um fetch aqui depois.
+        // fetch('dados_salas.json').then(res => res.json()).then(data => { disciplinasBrutas = data; renderizarComFiltro(); });
 
         const mapeamentoDias = {
             "2": "Segunda-feira",
@@ -199,61 +483,137 @@
         };
 
         function extrairAndar(salaStr) {
-            // Verifica se tem um número de 4 dígitos (ex: 1024, 2300, 3011)
             const match = salaStr.match(/\d{4}/);
             if (match) {
-                const numero = match[0];
-                const andar = numero.charAt(0);
-                return `${andar}º Andar`;
+                return `${match[0].charAt(0)}º Andar`;
             }
-            return "Andar não especificado";
+            return "Andar não espec.";
         }
 
-        function renderizarCards(dados) {
+        function isLaboratorio(turma, sala) {
+            const t = turma.toUpperCase().trim();
+            const s = sala.toUpperCase().trim();
+            // Lógica: Turma começa com L, PL, P ou a sala tem a palavra LAB
+            return t.startsWith('L') || t.startsWith('PL') || t.startsWith('P') || s.includes('LAB');
+        }
+
+        function agruparDisciplinas(dados) {
+            const agrupado = {};
+
+            dados.forEach(item => {
+                // Usa o código como chave única para a disciplina
+                const key = item.codigo;
+                
+                if (!agrupado[key]) {
+                    agrupado[key] = {
+                        codigo: item.codigo,
+                        nome: item.nome,
+                        periodo: item.periodo,
+                        turmas: {} // Objeto para guardar as turmas dessa disciplina
+                    };
+                }
+
+                const nomeTurma = item.turma.trim() || "Única";
+
+                if (!agrupado[key].turmas[nomeTurma]) {
+                    agrupado[key].turmas[nomeTurma] = {
+                        isLab: isLaboratorio(nomeTurma, item.sala),
+                        horarios: []
+                    };
+                }
+
+                // Adiciona o horário específico dentro da turma
+                agrupado[key].turmas[nomeTurma].horarios.push({
+                    dia: item.dia,
+                    horario: item.horario,
+                    sala: item.sala
+                });
+            });
+
+            // Converte o objeto de volta para array para facilitar a renderização
+            return Object.values(agrupado);
+        }
+
+        function renderizarCards(dadosAgrupados) {
             const container = document.getElementById('results');
             container.innerHTML = '';
 
-            if (dados.length === 0) {
+            if (dadosAgrupados.length === 0) {
                 container.innerHTML = '<div class="no-results">Nenhuma disciplina encontrada. Tente outros termos.</div>';
                 return;
             }
 
-            dados.forEach(item => {
-                const diaNome = mapeamentoDias[item.dia] || item.dia;
-                const andarInfo = extrairAndar(item.sala);
-                
+            dadosAgrupados.forEach(disciplina => {
                 const card = document.createElement('div');
                 card.className = 'card';
-                card.innerHTML = `
+                
+                // Cabeçalho do Card (Código e Nome da Disciplina)
+                let htmlCard = `
                     <div class="card-header">
-                        <span class="badge">${item.codigo}</span>
-                        <span class="badge">Período: ${item.periodo}</span>
+                        <span class="badge-codigo">${disciplina.codigo}</span>
+                        <span class="badge-periodo">${disciplina.periodo}º Período</span>
                     </div>
-                    <h2>${item.nome}</h2>
-                    <p>📚 <strong>Turma:</strong> ${item.turma}</p>
-                    <p>🕒 <strong>Horário:</strong> ${diaNome}, ${item.horario}</p>
-                    <p class="sala-destaque">📍 ${item.sala} (${andarInfo})</p>
+                    <h2>${disciplina.nome}</h2>
                 `;
+
+                // Renderiza as turmas dentro deste card
+                for (const [nomeTurma, dadosTurma] of Object.entries(disciplina.turmas)) {
+                    const tipoClasse = dadosTurma.isLab ? 'turma-pratica' : 'turma-teorica';
+                    const labelTipo = dadosTurma.isLab ? 'Prática / Lab' : 'Teórica';
+
+                    htmlCard += `
+                        <div class="turma-container ${tipoClasse}">
+                            <div class="turma-header">
+                                <span>Turma: ${nomeTurma}</span>
+                                <span class="turma-tipo-badge">${labelTipo}</span>
+                            </div>
+                    `;
+
+                    // Renderiza os horários dessa turma
+                    dadosTurma.horarios.forEach(h => {
+                        const diaNome = mapeamentoDias[h.dia] || h.dia;
+                        const andarInfo = extrairAndar(h.sala);
+                        
+                        htmlCard += `
+                            <div class="horario-item">
+                                <p>🕒 <strong>${diaNome}</strong>, ${h.horario}</p>
+                                <p>📍 <span class="sala-destaque">${h.sala}</span> (${andarInfo})</p>
+                            </div>
+                        `;
+                    });
+
+                    htmlCard += `</div>`; // Fecha turma-container
+                }
+
+                card.innerHTML = htmlCard;
                 container.appendChild(card);
             });
         }
 
-        // Sistema de busca em tempo real
-        document.getElementById('searchInput').addEventListener('input', function(e) {
-            const termoBusca = e.target.value.toLowerCase();
+        function executarFiltro() {
+            const termoBusca = document.getElementById('searchInput').value.toLowerCase();
             
-            const filtrados = disciplinas.filter(item => {
+            // 1. Filtramos a lista reta original primeiro
+            const filtrados = disciplinasBrutas.filter(item => {
                 return item.nome.toLowerCase().includes(termoBusca) ||
                        item.codigo.toLowerCase().includes(termoBusca) ||
                        item.sala.toLowerCase().includes(termoBusca) ||
                        item.turma.toLowerCase().includes(termoBusca);
             });
 
-            renderizarCards(filtrados);
-        });
+            // 2. Agrupamos apenas os resultados que passaram no filtro
+            const dadosAgrupados = agruparDisciplinas(filtrados);
+            
+            // 3. Jogamos na tela
+            renderizarCards(dadosAgrupados);
+        }
 
-        // Renderiza tudo ao carregar a página
-        renderizarCards(disciplinas);
+        // Listener de busca
+        document.getElementById('searchInput').addEventListener('input', executarFiltro);
+
+        // Renderiza tudo na primeira vez
+        executarFiltro();
+
     </script>
 </body>
 </html>
