@@ -505,8 +505,22 @@
          
         ];
 
-        // Se você for usar um arquivo externo (dados_salas.json), você fará um fetch aqui depois.
-        // fetch('dados_salas.json').then(res => res.json()).then(data => { disciplinasBrutas = data; renderizarComFiltro(); });
+    // Estado atual dos filtros
+        let filtros = {
+            busca: '',
+            periodo: 'todos',
+            dia: 'todos',
+            turno: 'todos'
+        };
+
+        function descobrirTurno(horario) {
+            if (!horario || !horario.includes(':')) return 'outro';
+            const hora = parseInt(horario.split('-')[0].split(':')[0], 10);
+            
+            if (hora < 12) return 'manha';
+            if (hora >= 12 && hora < 18) return 'tarde';
+            return 'noite';
+        }
 
         const mapeamentoDias = {
             "2": "Segunda-feira",
