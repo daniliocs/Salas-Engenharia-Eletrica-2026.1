@@ -5,6 +5,17 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Salas Eng. Elétrica UFMG</title>
     <style>
+
+/* --- SESSÃO DE FILTROS --- */
+.filters-container { max-width: 800px; margin: 0 auto 30px auto; display: flex; flex-direction: column; gap: 12px; background: #fff; padding: 15px; border-radius: 10px; box-shadow: 0 2px 4px rgba(0,0,0,0.03); }
+.filter-row { display: flex; align-items: center; gap: 8px; overflow-x: auto; padding-bottom: 5px; scrollbar-width: none; -ms-overflow-style: none; }
+.filter-row::-webkit-scrollbar { display: none; }
+.filter-label { font-weight: bold; font-size: 13px; color: #555; white-space: nowrap; min-width: 60px; }
+.filter-btn { background-color: #f1f5f9; border: 1px solid #e2e8f0; padding: 6px 14px; border-radius: 20px; cursor: pointer; font-size: 13px; white-space: nowrap; transition: all 0.2s; color: #475569; font-weight: 500; }
+.filter-btn:hover { background-color: #e2e8f0; }
+.filter-btn.active { background-color: var(--primary-color); color: white; border-color: var(--primary-color); }
+
+        
         :root {
             --primary-color: #c8102e; /* Vermelho UFMG */
             --bg-color: #f4f7f6;
@@ -186,7 +197,31 @@
         </div>
     </header>
 
+    <div class="filters-container">
+        <div class="filter-row" id="filter-periodo">
+            <span class="filter-label">Período:</span>
+            <button class="filter-btn active" data-value="todos">Todos</button>
+            <button class="filter-btn" data-value="1">1º</button>
+            <button class="filter-btn" data-value="Pos">Pós / Sem Per.</button>
+        </div>
+
+        <div class="filter-row" id="filter-dia">
+            <span class="filter-label">Dia:</span>
+            <button class="filter-btn active" data-value="todos">Todos</button>
+            <button class="filter-btn" data-value="2">Segunda</button>
+            <button class="filter-btn" data-value="Sáb">Sábado</button>
+        </div>
+
+        <div class="filter-row" id="filter-turno">
+            <span class="filter-label">Turno:</span>
+            <button class="filter-btn active" data-value="todos">Todos</button>
+            <button class="filter-btn" data-value="manha">Manhã (até 12h)</button>
+            <button class="filter-btn" data-value="tarde">Tarde (12h às 18h)</button>
+            <button class="filter-btn" data-value="noite">Noite (após 18h)</button>
+        </div>
+    </div>
     <main id="results" class="results-container">
+        
         </main>
 
     <script>
@@ -590,29 +625,49 @@
             });
         }
 
-        function executarFiltro() {
-            const termoBusca = document.getElementById('searchInput').value.toLowerCase();
-            
-            // 1. Filtramos a lista reta original primeiro
-            const filtrados = disciplinasBrutas.filter(item => {
-                return item.nome.toLowerCase().includes(termoBusca) ||
-                       item.codigo.toLowerCase().includes(termoBusca) ||
-                       item.sala.toLowerCase().includes(termoBusca) ||
-                       item.turma.toLowerCase().includes(termoBusca);
-            });
+        function aplicarFiltros() {
+    filtros.busca = document.getElementById('searchInput').value.toLowerCase();
 
-            // 2. Agrupamos apenas os resultados que passaram no filtro
-            const dadosAgrupados = agruparDisciplinas(filtrados);
-            
-            // 3. Jogamos na tela
-            renderizarCards(dadosAgrupados);
+    const filtrados = disciplinasBrutas.filter(item => {
+        const passaBusca = item.nome.toLowerCase().includes(filtros.busca) ||
+                           item.codigo.toLowerCase().includes(filtros.busca) ||
+                           item.sala.toLowerCase().includes(filtros.busca) ||
+                           item.turma.toLowerCase().includes(filtros.busca);
+
+        let periodoFormatado = item.periodo;
+        if (periodoFormatado.toLowerCase().includes('pos') || periodoFormatado.toLowerCase().includes('sem per')) {
+            periodoFormatado = 'Pos';
         }
+        
+        const passaPeriodo = filtros.periodo === 'todos' || periodoFormatado === filtros.periodo;
+        const passaDia = filtros.dia === 'todos' || item.dia === filtros.dia;
+        const passaTurno = filtros.turno === 'todos' || descobrirTurno(item.horario) === filtros.turno;
 
-        // Listener de busca
-        document.getElementById('searchInput').addEventListener('input', executarFiltro);
+        return passaBusca && passaPeriodo && passaDia && passaTurno;
+    });
 
-        // Renderiza tudo na primeira vez
-        executarFiltro();
+    renderizarCards(agruparDisciplinas(filtrados));
+}
+
+function setupBotoesFiltro(containerId, chaveFiltro) {
+    const container = document.getElementById(containerId);
+    const botoes = container.querySelectorAll('.filter-btn');
+    botoes.forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            botoes.forEach(b => b.classList.remove('active'));
+            e.target.classList.add('active');
+            filtros[chaveFiltro] = e.target.getAttribute('data-value');
+            aplicarFiltros();
+        });
+    });
+}
+
+document.getElementById('searchInput').addEventListener('input', aplicarFiltros);
+setupBotoesFiltro('filter-periodo', 'periodo');
+setupBotoesFiltro('filter-dia', 'dia');
+setupBotoesFiltro('filter-turno', 'turno');
+
+aplicarFiltros();
 
     </script>
 </body>
