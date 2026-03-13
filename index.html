@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Salas Eng. Elétrica UFMG</title>
+    <style>
+        :root {
+            --primary-color: #c8102e; /* Vermelho UFMG */
+            --bg-color: #f4f7f6;
+            --card-bg: #ffffff;
+            --text-main: #333333;
+            --text-muted: #666666;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            margin: 0;
+            padding: 20px;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        h1 {
+            color: var(--primary-color);
+            margin-bottom: 10px;
+        }
+
+        .search-container {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            box-sizing: border-box;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+
+        input[type="text"]:focus {
+            border-color: var(--primary-color);
+        }
+
+        .results-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+            max-width: 1200px;
+            margin: 30px auto;
+        }
+
+        .card {
+            background-color: var(--card-bg);
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            border-left: 5px solid var(--primary-color);
+            transition: transform 0.2s;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .badge {
+            background-color: #e2e8f0;
+            color: #475569;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .card h2 {
+            margin: 0 0 10px 0;
+            font-size: 18px;
+            color: var(--primary-color);
+        }
+
+        .card p {
+            margin: 5px 0;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .sala-destaque {
+            margin-top: 15px !important;
+            padding: 10px;
+            background-color: #fef2f2;
+            border-radius: 6px;
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+
+        .no-results {
+            text-align: center;
+            grid-column: 1 / -1;
+            color: var(--text-muted);
+            padding: 40px;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Consulta de Salas - Elétrica UFMG</h1>
+        <p>Encontre sua turma, horário e andar facilmente.</p>
+        <div class="search-container">
+            <input type="text" id="searchInput" placeholder="Busque por disciplina, código, sala ou turma...">
+        </div>
+    </header>
+
+    <main id="results" class="results-container">
+        </main>
+
+    <script>
+        // Amostra de dados estruturados (Você precisará converter o resto do PDF/Excel para este formato JSON)
+        const disciplinas = [
+            { codigo: "ELE042", nome: "PROCESSAMENTO DE SINAIS", periodo: "7", turma: "TTO", dia: "3", horario: "07:30-09:10", sala: "1166-BL 4" },
+            { codigo: "ELT013", nome: "CONTROLE DIGITAL", periodo: "7", turma: "TXA01", dia: "5", horario: "14:55-16:35", sala: "1027-BL 3" },
+            { codigo: "ELE049", nome: "ANÁLISE DE SISTEMAS ELÉTRICOS POTÊNCIA", periodo: "7", turma: "TTTAB", dia: "2", horario: "09:25-11:05", sala: "LRC" },
+            { codigo: "ELE064", nome: "ANÁLISE DE CIRCUITOS ELETRICOS I", periodo: "3", turma: "C", dia: "5", horario: "13:00-14:40", sala: "1024-BL 3" },
+            { codigo: "EEE001", nome: "INTRODUÇÃO À ENGENHARIA ELÉTRICA", periodo: "1", turma: "TEE", dia: "2", horario: "09:25-10:15", sala: "2300-BL 4" },
+            { codigo: "EEE009", nome: "Óptica e Optrônica", periodo: "Opt", turma: "TTEE", dia: "4", horario: "15:30-19:00", sala: "3010-BL 3" },
+            { codigo: "ENG030", nome: "Lab de Eletrônica Embarcada", periodo: "Opt", turma: "TM", dia: "5", horario: "14:55-18:30", sala: "2296-BL 4" }
+        ];
+
+        const mapeamentoDias = {
+            "2": "Segunda-feira",
+            "3": "Terça-feira",
+            "4": "Quarta-feira",
+            "5": "Quinta-feira",
+            "6": "Sexta-feira",
+            "Sáb": "Sábado"
+        };
+
+        function extrairAndar(salaStr) {
+            // Verifica se tem um número de 4 dígitos (ex: 1024, 2300, 3011)
+            const match = salaStr.match(/\d{4}/);
+            if (match) {
+                const numero = match[0];
+                const andar = numero.charAt(0);
+                return `${andar}º Andar`;
+            }
+            return "Andar não especificado";
+        }
+
+        function renderizarCards(dados) {
+            const container = document.getElementById('results');
+            container.innerHTML = '';
+
+            if (dados.length === 0) {
+                container.innerHTML = '<div class="no-results">Nenhuma disciplina encontrada. Tente outros termos.</div>';
+                return;
+            }
+
+            dados.forEach(item => {
+                const diaNome = mapeamentoDias[item.dia] || item.dia;
+                const andarInfo = extrairAndar(item.sala);
+                
+                const card = document.createElement('div');
+                card.className = 'card';
+                card.innerHTML = `
+                    <div class="card-header">
+                        <span class="badge">${item.codigo}</span>
+                        <span class="badge">Período: ${item.periodo}</span>
+                    </div>
+                    <h2>${item.nome}</h2>
+                    <p>📚 <strong>Turma:</strong> ${item.turma}</p>
+                    <p>🕒 <strong>Horário:</strong> ${diaNome}, ${item.horario}</p>
+                    <p class="sala-destaque">📍 ${item.sala} (${andarInfo})</p>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        // Sistema de busca em tempo real
+        document.getElementById('searchInput').addEventListener('input', function(e) {
+            const termoBusca = e.target.value.toLowerCase();
+            
+            const filtrados = disciplinas.filter(item => {
+                return item.nome.toLowerCase().includes(termoBusca) ||
+                       item.codigo.toLowerCase().includes(termoBusca) ||
+                       item.sala.toLowerCase().includes(termoBusca) ||
+                       item.turma.toLowerCase().includes(termoBusca);
+            });
+
+            renderizarCards(filtrados);
+        });
+
+        // Renderiza tudo ao carregar a página
+        renderizarCards(disciplinas);
+    </script>
+</body>
+</html>
